@@ -352,7 +352,7 @@ body{overflow:hidden;background:#000;font-family:'Courier New',monospace}
 <div id="instructions">
   <h1>TACTICAL SURVIVAL</h1>
   <p>클릭하여 전투 시작</p>
-  <p class="pc-only">W A S D 이동 | SPACE 점프 | 좌클릭 사격 | 우클릭 조준 | R 재장전</p>
+  <p class="pc-only">W A S D 이동 | SPACE 점프 | SHIFT 앉기 | 좌클릭 사격 | 우클릭 조준 | R 재장전</p>
   <p class="pc-only">1~0 / Q / E 무기 선택 (12종)</p>
   <p class="mob-only" style="display:none">조이스틱 이동 | 드래그 시점 | FIRE 사격 | ADS 조준</p>
   <div class="hint">12종 무기 · 적 체력바 · 총기 반동 · 벽 슬라이딩</div>
@@ -4549,7 +4549,7 @@ function doStartStage(sid){
   if(isMobile){
     instrEl.innerHTML='<h1>'+st.name+'</h1><p style="color:#00ff88;letter-spacing:2px;font-size:13px;margin-bottom:8px">'+st.sub+'</p><p>터치하여 전투 시작</p><p>왼쪽 조이스틱: 이동 | 오른쪽 드래그: 시점</p><p>FIRE: 사격 | ADS: 조준 | R: 재장전 | ◀▶: 무기</p><div class="hint">웨이브 클리어 시 업그레이드 선택 → '+st.waves+'웨이브 모두 클리어하면 다음 스테이지 해금</div>';
   }else{
-    instrEl.innerHTML='<h1>'+st.name+'</h1><p style="color:#00ff88;letter-spacing:2px;font-size:13px;margin-bottom:8px">'+st.sub+'</p><p>클릭하여 전투 시작</p><p>W A S D 이동 | SPACE 점프 | 좌클릭 사격 | 우클릭 조준 | R 재장전</p><p>1~0 / Q / E 무기 선택 · 마우스 휠 무기 전환</p><div class="hint">웨이브 클리어 시 업그레이드 선택 → '+st.waves+'웨이브 모두 클리어하면 다음 스테이지 해금</div>';
+    instrEl.innerHTML='<h1>'+st.name+'</h1><p style="color:#00ff88;letter-spacing:2px;font-size:13px;margin-bottom:8px">'+st.sub+'</p><p>클릭하여 전투 시작</p><p>W A S D 이동 | SPACE 점프 | SHIFT 앉기 | 좌클릭 사격 | 우클릭 조준 | R 재장전</p><p>1~0 / Q / E 무기 선택 · 마우스 휠 무기 전환</p><div class="hint">웨이브 클리어 시 업그레이드 선택 → '+st.waves+'웨이브 모두 클리어하면 다음 스테이지 해금</div>';
   }
   instrEl.style.display='block';
   // 이어하기로 보스 웨이브에 진입 시 보스 스폰
@@ -4733,13 +4733,14 @@ function goToMenu(){
   saveProg();clearAll();if(spawnInterval){clearInterval(spawnInterval);spawnInterval=null;}spawnWasStopped=false;
   mobileActive=false;ctrl.unlock();showStageLobby(false);
 }
-const _gameKeys=new Set(['KeyW','KeyS','KeyA','KeyD','KeyR','KeyC','KeyE','KeyQ','Space','ControlLeft','ControlRight','Digit1','Digit2','Digit3','Digit4','Digit5','Digit6','Digit7','Digit8','Digit9','Digit0']);
+const _gameKeys=new Set(['KeyW','KeyS','KeyA','KeyD','KeyR','KeyC','KeyE','KeyQ','Space','ControlLeft','ControlRight','ShiftLeft','ShiftRight','Digit1','Digit2','Digit3','Digit4','Digit5','Digit6','Digit7','Digit8','Digit9','Digit0']);
 document.addEventListener('keydown',e=>{
   if(e.code==='Escape'){goToMenu();return;}
   // 플레이 중에는 게임키와 Ctrl 조합(Ctrl+A 전체선택 등)의 브라우저 기본 동작을 차단
   if((ctrl.isLocked||mobileActive)&&(e.ctrlKey||_gameKeys.has(e.code)))e.preventDefault();
   // Ctrl 은 플레이 중 아무 동작도 하지 않는다 (기본 동작만 차단)
   if(e.code==='ControlLeft'||e.code==='ControlRight')return;
+  if(e.code==='ShiftLeft'||e.code==='ShiftRight')crouching=true;
   if(e.code==='KeyW')mF=true;if(e.code==='KeyS')mB=true;if(e.code==='KeyA')mL=true;if(e.code==='KeyD')mR=true;
   if(e.code==='KeyR')startReload();
   if(e.code==='KeyC'&&ctrl.isLocked&&!gameOver)useSkill('c');
@@ -4756,7 +4757,7 @@ document.addEventListener('keydown',e=>{
   if(mp[e.code]&&getCurStage().weapons.includes(mp[e.code]))switchWep(mp[e.code]);
 });
 document.getElementById('menu-btn').addEventListener('click',goToMenu);
-document.addEventListener('keyup',e=>{if(e.code==='KeyW')mF=false;if(e.code==='KeyS')mB=false;if(e.code==='KeyA')mL=false;if(e.code==='KeyD')mR=false;if(e.code==='ControlLeft'||e.code==='ControlRight')return;});
+document.addEventListener('keyup',e=>{if(e.code==='KeyW')mF=false;if(e.code==='KeyS')mB=false;if(e.code==='KeyA')mL=false;if(e.code==='KeyD')mR=false;if(e.code==='ControlLeft'||e.code==='ControlRight')return;if(e.code==='ShiftLeft'||e.code==='ShiftRight')crouching=false;});
 document.addEventListener('wheel',e=>{
   if(!ctrl.isLocked||gameOver||choosingStage)return;
   e.preventDefault();
