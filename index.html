@@ -443,6 +443,7 @@ const _geoCache={
   ring015:new THREE.TorusGeometry(1,0.15,6,32),
   ringThin:new THREE.TorusGeometry(1,0.06,4,28),
   ringFlat:new THREE.RingGeometry(0.85,1,32),
+  circleFlat:new THREE.CircleGeometry(1,14),
   ringFlatThick:new THREE.RingGeometry(0.7,1,32),
   slashPlane:new THREE.PlaneGeometry(1,0.35,1,1),
   beamPlane:new THREE.PlaneGeometry(1,1,1,1),
@@ -5280,90 +5281,116 @@ function _makeParticle(type, color, size){
   return m;
 }
 
-// 적 사망 폭발 이펙트 (피, 불꽃, 연기, 파편)
+// ── 지면 자국(핏자국·그을음) — 최대 개수를 정해두고 오래된 것부터 재활용 ──
+const _decals=[];const _DECAL_MAX=16;
+function spawnGroundDecal(pos,color,size){
+  const d=new THREE.Mesh(_geoCache.circleFlat,new THREE.MeshBasicMaterial({
+    color,transparent:true,opacity:0,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));
+  d.rotation.x=-Math.PI/2;
+  d.position.set(pos.x,0.02,pos.z);
+  const sc=size*(0.8+Math.random()*0.6);
+  d.scale.set(sc,sc*(0.85+Math.random()*0.3),1);
+  d.rotation.z=Math.random()*Math.PI;
+  d._baseScale=1;
+  d.userData={life:7,maxLife:7,type:'decal',startOpacity:0.5,fadeIn:0.3};
+  scene.add(d);parts.push(d);_decals.push(d);
+  if(_decals.length>_DECAL_MAX){const old=_decals.shift();scene.remove(old);old.material.dispose?.();}
+}
+
+// ── 폭발 충격에 따른 카메라 흔들림 ──
+let camShake=0;
+function addCamShake(pos,power){
+  const d=yawObj.position.distanceTo(pos);
+  const f=Math.max(0,1-d/26);
+  if(f>0)camShake=Math.min(0.32,camShake+power*f*f);
+}
+
+// 적 사망 이펙트 (피 분사 · 낙하하는 핏방울 · 흙먼지)
 function spawnFX(pos){
   const cx=pos.x, cy=pos.y, cz=pos.z;
 
-  // 중앙 플래시 구
-  const flash=new THREE.Mesh(_geoCache.sphereXXL,new THREE.MeshBasicMaterial({color:0xff6600,transparent:true,opacity:0.9,depthWrite:false}));
-  flash.scale.setScalar(0.6);flash._baseScale=0.6;
-  flash.position.set(cx,cy+1.5,cz);
-  flash.userData={vel:new THREE.Vector3(0,0,0),life:0.12,maxLife:0.12,type:'glow',scl:1};
-  scene.add(flash);parts.push(flash);
-
-  // 스파크 (빠르고 얇게)
+  // 피 분무 — 타격 순간 퍼지는 미세한 붉은 안개
+  for(let i=0;i<7;i++){
+    const p=_makeParticle('blood',i%2?0x6b0b0b:0x8f1212,0.10+Math.random()*0.12);
+    p.position.set(cx+(Math.random()-0.5)*0.4,cy+1.3+Math.random()*0.9,cz+(Math.random()-0.5)*0.4);
+    const ang=Math.random()*Math.PI*2,spd=1.5+Math.random()*3;
+    p.userData={vel:new THREE.Vector3(Math.cos(ang)*spd,1+Math.random()*2,Math.sin(ang)*spd),
+      life:0.22+Math.random()*0.18,maxLife:0.4,type:'blood',drag:3.2,grav:10};
+    scene.add(p);parts.push(p);
+  }
+  // 핏방울 — 포물선을 그리며 떨어져 바닥에 자국을 남긴다
   for(let i=0;i<6;i++){
-    const p=_makeParticle('spark',i%3===0?0xffdd00:0xff6600,0.04);
-    p.position.set(cx,cy+1.2+Math.random()*0.8,cz);
-    const spd=6+Math.random()*10;
-    const ang=Math.random()*Math.PI*2, elev=(Math.random()-0.3)*Math.PI*0.8;
-    p.userData={vel:new THREE.Vector3(Math.cos(ang)*Math.cos(elev)*spd,(Math.sin(elev)+0.5)*spd,Math.sin(ang)*Math.cos(elev)*spd),life:0.3+Math.random()*0.4,maxLife:0.7,type:'spark'};
-    p.lookAt(p.position.clone().add(p.userData.vel));
+    const p=_makeParticle('blood',0x5e0808,0.045+Math.random()*0.045);
+    p.position.set(cx+(Math.random()-0.5)*0.3,cy+1.2+Math.random()*1.0,cz+(Math.random()-0.5)*0.3);
+    const ang=Math.random()*Math.PI*2,spd=2+Math.random()*5;
+    p.userData={vel:new THREE.Vector3(Math.cos(ang)*spd,2.5+Math.random()*3.5,Math.sin(ang)*spd),
+      life:1.4,maxLife:1.4,type:'blood',drag:0.6,grounds:true,decal:true,decalColor:0x4a0606,decalSize:0.28};
     scene.add(p);parts.push(p);
   }
-  // 핏방울 (붉은 구)
-  for(let i=0;i<5;i++){
-    const p=_makeParticle('blood',0xaa0000,0.06+Math.random()*0.07);
-    p.position.set(cx+(Math.random()-0.5)*0.3,cy+1.0+Math.random()*1.2,cz+(Math.random()-0.5)*0.3);
-    const spd=2+Math.random()*5;
-    const ang=Math.random()*Math.PI*2;
-    p.userData={vel:new THREE.Vector3(Math.cos(ang)*spd,2+Math.random()*4,Math.sin(ang)*spd),life:0.5+Math.random()*0.4,maxLife:0.9,type:'blood'};
+  // 발밑 흙먼지 — 쓰러질 때 이는 먼지
+  for(let i=0;i<3;i++){
+    const p=_makeParticle('smoke',0,0.22+Math.random()*0.2);
+    p.material.color.setHex(0x6b6055);
+    p.position.set(cx+(Math.random()-0.5)*0.8,0.25+Math.random()*0.4,cz+(Math.random()-0.5)*0.8);
+    p.userData={vel:new THREE.Vector3((Math.random()-0.5)*1.2,0.5+Math.random()*0.5,(Math.random()-0.5)*1.2),
+      life:0.9+Math.random()*0.5,maxLife:1.4,type:'smoke',startOpacity:0.22,buoy:0.2,grow:2.4,spin:0.5};
     scene.add(p);parts.push(p);
   }
-  // 연기 구름
-  for(let i=0;i<4;i++){
-    const p=_makeParticle('smoke',0,0.15+Math.random()*0.25);
-    p.position.set(cx+(Math.random()-0.5)*0.5,cy+0.5+Math.random()*1.5,cz+(Math.random()-0.5)*0.5);
-    p.userData={vel:new THREE.Vector3((Math.random()-0.5)*1.5,0.8+Math.random()*1.5,(Math.random()-0.5)*1.5),life:0.8+Math.random()*0.6,maxLife:1.4,type:'smoke',startSize:p.scale.x};
+  // 장비 파편 몇 조각
+  for(let i=0;i<3;i++){
+    const p=_makeParticle('debris',0x2a2a2a,0.07+Math.random()*0.08);
+    p.position.set(cx+(Math.random()-0.5)*0.3,cy+0.9+Math.random()*1.0,cz+(Math.random()-0.5)*0.3);
+    const ang=Math.random()*Math.PI*2,spd=2+Math.random()*4;
+    p.userData={vel:new THREE.Vector3(Math.cos(ang)*spd,2.5+Math.random()*3,Math.sin(ang)*spd),
+      life:0.9+Math.random()*0.5,maxLife:1.4,type:'debris',drag:0.5,
+      rotV:new THREE.Vector3(Math.random()*10-5,Math.random()*10-5,Math.random()*10-5)};
     scene.add(p);parts.push(p);
   }
-  // 파편 (작은 박스들)
-  for(let i=0;i<4;i++){
-    const p=_makeParticle('debris',0x333333,0.08+Math.random()*0.1);
-    p.position.set(cx+(Math.random()-0.5)*0.3,cy+0.8+Math.random()*1.0,cz+(Math.random()-0.5)*0.3);
-    const spd=3+Math.random()*6;
-    const ang=Math.random()*Math.PI*2;
-    p.userData={vel:new THREE.Vector3(Math.cos(ang)*spd,3+Math.random()*4,Math.sin(ang)*spd),life:0.6+Math.random()*0.5,maxLife:1.1,type:'debris',rotV:new THREE.Vector3(Math.random()*10-5,Math.random()*10-5,Math.random()*10-5)};
-    scene.add(p);parts.push(p);
-  }
-  // 충격파 링
-  const ring=new THREE.Mesh(_geoCache.ring04,new THREE.MeshBasicMaterial({color:0xff8800,transparent:true,opacity:0.8,depthWrite:false}));
-  ring.scale.setScalar(0.1);ring._baseScale=0.1;
-  ring.rotation.x=Math.PI/2;
-  ring.position.set(cx,cy+0.1,cz);
-  ring.userData={vel:new THREE.Vector3(),life:0.28,maxLife:0.28,type:'shockwave'};
-  scene.add(ring);parts.push(ring);
+  // 바닥 핏자국
+  spawnGroundDecal(new THREE.Vector3(cx,0,cz),0x460505,0.7);
 }
 
 // 총격 화염 이펙트 (총구 플래시 파티클)
 function spawnMuzzleFX(pos, dir, color){
-  // 화염 스파크
-  for(let i=0;i<6;i++){
-    const p=_makeParticle('spark', i%2===0?0xffee88:color||0xff8800, 0.03);
+  // 화염 스파크 — 총구에서 아주 짧게 터지고 즉시 사라진다
+  for(let i=0;i<5;i++){
+    const p=_makeParticle('spark',i===0?0xfff3cc:(color||0xffaa33),0.03+Math.random()*0.02);
     p.position.copy(pos);
-    const spread=0.3;
-    const spd=8+Math.random()*12;
+    const spread=0.22, spd=10+Math.random()*14;
     const sdir=dir.clone();
     sdir.x+=(Math.random()-0.5)*spread;sdir.y+=(Math.random()-0.5)*spread;sdir.z+=(Math.random()-0.5)*spread;sdir.normalize();
-    p.userData={vel:sdir.multiplyScalar(spd),life:0.08+Math.random()*0.1,maxLife:0.18,type:'spark'};
+    p.userData={vel:sdir.multiplyScalar(spd),life:0.05+Math.random()*0.06,maxLife:0.11,type:'spark',drag:6,cool:true};
     p.lookAt(p.position.clone().add(p.userData.vel));
     scene.add(p);parts.push(p);
+  }
+  // 총구 연기 — 발사 후 옅게 피어오른다
+  if(Math.random()<0.5){
+    const sm=_makeParticle('smoke',0,0.07);
+    sm.material.color.setHex(0x9a9a9a);
+    sm.position.copy(pos);
+    sm.userData={vel:dir.clone().multiplyScalar(1.2).add(new THREE.Vector3(0,0.5,0)),
+      life:0.45,maxLife:0.45,type:'smoke',startOpacity:0.15,buoy:0.5,grow:3,spin:0.6};
+    scene.add(sm);parts.push(sm);
   }
 }
 
 // 피격 이펙트 (벽/바닥)
 function spawnImpactFX(pos){
-  for(let i=0;i<6;i++){
-    const p=_makeParticle('spark',0xddaa55,0.025);
+  // 튀는 파편 — 표면을 긁고 속도를 잃는다
+  for(let i=0;i<4;i++){
+    const p=_makeParticle('spark',0xd8b070,0.022);
     p.position.copy(pos);
-    const spd=2+Math.random()*4;
-    const ang=Math.random()*Math.PI*2;
-    p.userData={vel:new THREE.Vector3(Math.cos(ang)*spd,1+Math.random()*2,Math.sin(ang)*spd),life:0.15+Math.random()*0.2,maxLife:0.35,type:'spark'};
+    const spd=2+Math.random()*4,ang=Math.random()*Math.PI*2;
+    p.userData={vel:new THREE.Vector3(Math.cos(ang)*spd,1+Math.random()*2.5,Math.sin(ang)*spd),
+      life:0.12+Math.random()*0.18,maxLife:0.3,type:'spark',drag:3,cool:true};
     scene.add(p);parts.push(p);
   }
-  const dust=_makeParticle('smoke',0,0.08);
+  // 착탄 먼지
+  const dust=_makeParticle('smoke',0,0.10);
+  dust.material.color.setHex(0x7d7266);
   dust.position.copy(pos);
-  dust.userData={vel:new THREE.Vector3((Math.random()-0.5)*0.5,0.4,(Math.random()-0.5)*0.5),life:0.35,maxLife:0.35,type:'smoke',startSize:1};
+  dust.userData={vel:new THREE.Vector3((Math.random()-0.5)*0.6,0.5,(Math.random()-0.5)*0.6),
+    life:0.5,maxLife:0.5,type:'smoke',startOpacity:0.24,buoy:0.3,grow:2.6,spin:0.5};
   scene.add(dust);parts.push(dust);
 }
 
@@ -6261,34 +6288,47 @@ function spawnTimeStopFX(pos,color){
 // 폭발 이펙트 (수류탄/지뢰)
 function spawnExplosionFX(pos){
   const cx=pos.x,cy=pos.y,cz=pos.z;
-  // 대형 플래시
-  const flash=_makeParticle('glow',0xffcc00,1.2);
-  flash.position.set(cx,cy+0.3,cz);
-  flash.userData={vel:new THREE.Vector3(0,0.2,0),life:0.15,maxLife:0.15,type:'glow'};
-  scene.add(flash);parts.push(flash);
-  // 대량 스파크
-  for(let i=0;i<12;i++){
-    const p=_makeParticle('spark',i%3===0?0xffff00:i%3===1?0xff6600:0xff2200,0.05);
-    p.position.set(cx+(Math.random()-0.5)*0.5,cy+0.3+Math.random()*0.5,cz+(Math.random()-0.5)*0.5);
-    const spd=6+Math.random()*14,ang=Math.random()*Math.PI*2,elev=(Math.random()*0.8+0.1)*Math.PI;
-    p.userData={vel:new THREE.Vector3(Math.cos(ang)*Math.cos(elev)*spd,Math.abs(Math.sin(elev))*spd+1,Math.sin(ang)*Math.cos(elev)*spd),life:0.3+Math.random()*0.5,maxLife:0.8,type:'spark'};
-    p.lookAt(p.position.clone().add(p.userData.vel));scene.add(p);parts.push(p);
-  }
-  for(let i=0;i<6;i++){
-    const p=_makeParticle('smoke',0,0.2+Math.random()*0.3);
-    p.position.set(cx+(Math.random()-0.5)*1.5,cy+Math.random()*1.5,cz+(Math.random()-0.5)*1.5);
-    p.userData={vel:new THREE.Vector3((Math.random()-0.5)*2,1.5+Math.random()*2,(Math.random()-0.5)*2),life:0.8+Math.random()*0.8,maxLife:1.6,type:'smoke',startSize:1};
+  addCamShake(pos,0.22);
+  // 화구 — 밝은 중심이 빠르게 부풀었다 사그라든다
+  const core=_makeParticle('glow',0xfff0b0,0.9);
+  core.position.set(cx,cy+0.4,cz);
+  core.userData={vel:new THREE.Vector3(0,0.6,0),life:0.11,maxLife:0.11,type:'glow'};
+  scene.add(core);parts.push(core);
+  // 불덩이 뭉치 — 위로 솟으며 검게 식는다
+  for(let i=0;i<5;i++){
+    const p=_makeParticle('glow',i%2?0xff7a1e:0xffb038,0.5+Math.random()*0.5);
+    p.position.set(cx+(Math.random()-0.5)*1.1,cy+0.4+Math.random()*0.9,cz+(Math.random()-0.5)*1.1);
+    p.userData={vel:new THREE.Vector3((Math.random()-0.5)*2.2,2+Math.random()*2.5,(Math.random()-0.5)*2.2),
+      life:0.3+Math.random()*0.25,maxLife:0.55,type:'glow'};
     scene.add(p);parts.push(p);
   }
-  // 충격파 두 개 — ri=0: r=0.1 tube=0.08 (ratio 0.8), ri=1: r=0.4 tube=0.06 (ratio 0.15)
-  for(let ri=0;ri<2;ri++){
-    const baseR=0.1+ri*0.3;
-    const ring=new THREE.Mesh(ri===0?_geoCache.ring08:_geoCache.ring015,new THREE.MeshBasicMaterial({color:ri===0?0xffaa00:0xff4400,transparent:true,opacity:0.7,depthWrite:false}));
-    ring.scale.setScalar(baseR);ring._baseScale=baseR;
-    ring.rotation.x=Math.PI/2;ring.position.set(cx,cy+0.08+ri*0.04,cz);
-    ring.userData={vel:new THREE.Vector3(),life:0.3+ri*0.08,maxLife:0.3+ri*0.08,type:'shockwave'};
-    scene.add(ring);parts.push(ring);
+  // 불티 — 공기저항으로 금방 느려지고 붉게 식으며 바닥으로 떨어진다
+  for(let i=0;i<12;i++){
+    const p=_makeParticle('spark',0xffcc44,0.045);
+    p.position.set(cx+(Math.random()-0.5)*0.6,cy+0.4+Math.random()*0.6,cz+(Math.random()-0.5)*0.6);
+    const spd=5+Math.random()*12,ang=Math.random()*Math.PI*2,elev=(Math.random()*0.8+0.1)*Math.PI;
+    p.userData={vel:new THREE.Vector3(Math.cos(ang)*Math.cos(elev)*spd,Math.abs(Math.sin(elev))*spd+1.5,Math.sin(ang)*Math.cos(elev)*spd),
+      life:0.5+Math.random()*0.6,maxLife:1.1,type:'spark',drag:1.6,cool:true};
+    p.lookAt(p.position.clone().add(p.userData.vel));scene.add(p);parts.push(p);
   }
+  // 검은 연기 기둥 — 오래 남아 천천히 흩어진다
+  for(let i=0;i<5;i++){
+    const p=_makeParticle('smoke',0,0.4+Math.random()*0.4);
+    p.material.color.setHex(i<3?0x1a1a1a:0x3a3128);
+    p.position.set(cx+(Math.random()-0.5)*1.2,cy+0.3+Math.random()*1.2,cz+(Math.random()-0.5)*1.2);
+    p.userData={vel:new THREE.Vector3((Math.random()-0.5)*1.4,1.2+Math.random()*1.4,(Math.random()-0.5)*1.4),
+      life:1.6+Math.random()*1.0,maxLife:2.6,type:'smoke',startOpacity:0.38,buoy:0.7,grow:3.6,spin:0.35};
+    scene.add(p);parts.push(p);
+  }
+  // 지면을 훑는 흙먼지 고리
+  const dustRing=new THREE.Mesh(_geoCache.circleFlat,new THREE.MeshBasicMaterial({
+    color:0x6a5c4c,transparent:true,opacity:0.4,depthWrite:false,polygonOffset:true,polygonOffsetFactor:-2,polygonOffsetUnits:-2}));
+  dustRing.rotation.x=-Math.PI/2;dustRing.position.set(cx,0.05,cz);
+  dustRing.scale.setScalar(0.6);dustRing._baseScale=0.6;
+  dustRing.userData={vel:new THREE.Vector3(),life:0.55,maxLife:0.55,type:'fadeGrow',startOpacity:0.4,growFactor:7};
+  scene.add(dustRing);parts.push(dustRing);
+  // 그을음 자국
+  spawnGroundDecal(new THREE.Vector3(cx,0,cz),0x14100c,1.5);
 }
 
 // 파티클 업데이트 (공통)
@@ -6311,21 +6351,37 @@ function _updateParticleArray(arr, dt){
       p.intensity=20*(t);
       continue;
     }
-    // 위치 이동
+    // 위치 이동 — 중력 + 공기저항(실제 파편/불티는 금방 속도를 잃는다)
     if(ud.vel){
-      if(ud.type!=='smoke'&&ud.type!=='glow')ud.vel.y-=18*dt;
+      if(ud.type!=='smoke'&&ud.type!=='glow')ud.vel.y-=(ud.grav!==undefined?ud.grav:18)*dt;
+      if(ud.drag)ud.vel.multiplyScalar(Math.max(0,1-ud.drag*dt));
       p.position.addScaledVector(ud.vel,dt);
+      // 지면에 닿으면 튀지 않고 멈춘다(핏방울은 바닥 자국을 남긴다)
+      if(ud.grounds&&p.position.y<=0.03){
+        p.position.y=0.03;ud.vel.set(0,0,0);
+        if(ud.decal&&!ud._decalDone){ud._decalDone=true;spawnGroundDecal(p.position,ud.decalColor||0x5a0a0a,ud.decalSize||0.25);}
+        ud.life=Math.min(ud.life,0.05);
+      }
     }
     // 타입별 처리 — 캐시된 단위 geometry 위에서 스케일 애니메이션은 _baseScale 을 곱해야 원래 시각적 크기가 유지된다
     const bs=p._baseScale||1;
     if(ud.type==='spark'){
-      if(p.material){p.material.opacity=t*t;}
+      if(p.material){
+        p.material.opacity=t*t;
+        if(ud.cool)p.material.color.setRGB(1,0.25+t*0.6,t*t*0.25); // 노랑 → 주황 → 붉은 재
+      }
+    } else if(ud.type==='decal'){
+      if(p.material){const f=ud.fadeIn||0.25;p.material.opacity=(ud.startOpacity||0.55)*(t>1-f?(1-t)/f:Math.min(1,t*3));}
     } else if(ud.type==='blood'||ud.type==='ember'){
       if(p.material){p.material.opacity=t;}
       p.scale.setScalar(bs*(t*0.8+0.2));
     } else if(ud.type==='smoke'){
-      if(p.material){p.material.opacity=0.18*(1-t)*t*4;}
-      p.scale.setScalar(bs*(1+(1-t)*2.5));
+      // 실제 연기처럼 천천히 부풀며 옅어지고, 위로 흐르다 속도를 잃는다
+      if(ud.vel){ud.vel.y+=(ud.buoy||0.5)*dt;ud.vel.multiplyScalar(Math.max(0,1-1.1*dt));}
+      p.rotation.z+=(ud.spin||0.4)*dt;
+      const age=1-t;
+      if(p.material){p.material.opacity=(ud.startOpacity||0.34)*Math.min(1,age*6)*t*t;}
+      p.scale.setScalar(bs*(1+age*(ud.grow||3.2)));
     } else if(ud.type==='glow'){
       if(p.material){p.material.opacity=t*0.8;}
       p.scale.setScalar(bs*(1+(1-t)*3));
@@ -6445,13 +6501,28 @@ function _adaptRes(dt){
   else if(fps>58)next=Math.min(max,_resScale+0.1);
   if(Math.abs(next-_resScale)>0.01){_resScale=next;renderer.setPixelRatio(_resScale);}
 }
+// 폭발 충격 — 카메라를 짧게 흔든다 (감쇠).
+// PointerLockControls(r160)의 getObject()는 카메라 자체라서 위치를 직접 쓰면 플레이어가 이동한다.
+// 그래서 매 프레임 이전 흔들림 오프셋을 먼저 되돌린 뒤 새 오프셋을 더한다.
+const _shakeOff=new THREE.Vector3();
+function applyCamShake(dt){
+  camera.position.sub(_shakeOff);_shakeOff.set(0,0,0);
+  if(camShake<=0.0005){
+    if(camShake!==0){camShake=0;camera.rotation.z=0;}
+    return;
+  }
+  camShake*=Math.pow(0.02,dt);
+  _shakeOff.set((Math.random()-0.5)*camShake,(Math.random()-0.5)*camShake,(Math.random()-0.5)*camShake);
+  camera.position.add(_shakeOff);
+  camera.rotation.z=(Math.random()-0.5)*camShake*0.5;
+}
 function animate(){
   requestAnimationFrame(animate);
   // ── 일시정지 중이면 게임 로직 스킵, 렌더만 수행 ──
   if(gamePaused){renderer.render(scene,camera);return;}
   const now=performance.now(),dt=Math.min((now-lastT)/1000,0.05);lastT=now;
   const isPlaying=(ctrl.isLocked||mobileActive)&&!gameOver;
-  if(isPlaying){_adaptRes(dt);updatePlayer(dt);updateGunRecoil(dt);updateAim();updateTimers(dt);updateEnemies(dt);updateBullets(dt);updateEnemyBullets(dt);updateLaserBeams(dt);updateFX(dt);updateBuffItems(dt);updateGimmicks(dt);tickHitZone(dt);updateSkillHUD(dt);updateSkillFX(dt);updateDrone(dt);updateMines(dt);tickSkillNotify(dt);updatePlacePreview();}
+  if(isPlaying){_adaptRes(dt);updatePlayer(dt);applyCamShake(dt);updateGunRecoil(dt);updateAim();updateTimers(dt);updateEnemies(dt);updateBullets(dt);updateEnemyBullets(dt);updateLaserBeams(dt);updateFX(dt);updateBuffItems(dt);updateGimmicks(dt);tickHitZone(dt);updateSkillHUD(dt);updateSkillFX(dt);updateDrone(dt);updateMines(dt);tickSkillNotify(dt);updatePlacePreview();}
   renderer.render(scene,camera);
 }
 window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
