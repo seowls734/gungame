@@ -6499,7 +6499,6 @@ function animate(){
   const now=performance.now(),dt=Math.min((now-lastT)/1000,0.05);lastT=now;
   const isPlaying=(ctrl.isLocked||mobileActive)&&!gameOver;
   if(isPlaying){_adaptRes(dt);updatePlayer(dt);updateGunRecoil(dt);updateAim();updateTimers(dt);updateEnemies(dt);updateBullets(dt);updateEnemyBullets(dt);updateLaserBeams(dt);updateFX(dt);updateBuffItems(dt);updateGimmicks(dt);tickHitZone(dt);updateSkillHUD(dt);updateSkillFX(dt);updateDrone(dt);updateMines(dt);tickSkillNotify(dt);updatePlacePreview();}
-  if(camera.rotation.z!==0)camera.rotation.z=0;
   renderer.render(scene,camera);
 }
 window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
