@@ -6507,14 +6507,12 @@ function _adaptRes(dt){
 const _shakeOff=new THREE.Vector3();
 function applyCamShake(dt){
   camera.position.sub(_shakeOff);_shakeOff.set(0,0,0);
-  if(camShake<=0.0005){
-    if(camShake!==0){camShake=0;camera.rotation.z=0;}
-    return;
-  }
+  if(camShake<=0.0005){camShake=0;return;}
   camShake*=Math.pow(0.02,dt);
+  // 회전(roll)은 건드리지 않는다 — PointerLockControls가 카메라 쿼터니언에서 각도를
+  // 되읽기 때문에 roll을 넣으면 다음 마우스 이동에서 시야가 뒤집힌다.
   _shakeOff.set((Math.random()-0.5)*camShake,(Math.random()-0.5)*camShake,(Math.random()-0.5)*camShake);
   camera.position.add(_shakeOff);
-  camera.rotation.z=(Math.random()-0.5)*camShake*0.5;
 }
 function animate(){
   requestAnimationFrame(animate);
