@@ -5297,14 +5297,6 @@ function spawnGroundDecal(pos,color,size){
   if(_decals.length>_DECAL_MAX){const old=_decals.shift();scene.remove(old);old.material.dispose?.();}
 }
 
-// ── 폭발 충격에 따른 카메라 흔들림 ──
-let camShake=0;
-function addCamShake(pos,power){
-  const d=yawObj.position.distanceTo(pos);
-  const f=Math.max(0,1-d/26);
-  if(f>0)camShake=Math.min(0.32,camShake+power*f*f);
-}
-
 // 적 사망 이펙트 (피 분사 · 낙하하는 핏방울 · 흙먼지)
 function spawnFX(pos){
   const cx=pos.x, cy=pos.y, cz=pos.z;
@@ -6288,7 +6280,6 @@ function spawnTimeStopFX(pos,color){
 // 폭발 이펙트 (수류탄/지뢰)
 function spawnExplosionFX(pos){
   const cx=pos.x,cy=pos.y,cz=pos.z;
-  addCamShake(pos,0.22);
   // 화구 — 밝은 중심이 빠르게 부풀었다 사그라든다
   const core=_makeParticle('glow',0xfff0b0,0.9);
   core.position.set(cx,cy+0.4,cz);
@@ -6501,28 +6492,13 @@ function _adaptRes(dt){
   else if(fps>58)next=Math.min(max,_resScale+0.1);
   if(Math.abs(next-_resScale)>0.01){_resScale=next;renderer.setPixelRatio(_resScale);}
 }
-// 폭발 충격 — 카메라를 짧게 흔든다 (감쇠).
-// PointerLockControls(r160)의 getObject()는 카메라 자체라서 위치를 직접 쓰면 플레이어가 이동한다.
-// 그래서 매 프레임 이전 흔들림 오프셋을 먼저 되돌린 뒤 새 오프셋을 더한다.
-const _shakeOff=new THREE.Vector3();
-function applyCamShake(dt){
-  // 예전 버전에서 남아 있을 수 있는 기울기(roll)를 매 프레임 확실히 0으로 되돌린다
-  if(camera.rotation.z!==0)camera.rotation.z=0;
-  camera.position.sub(_shakeOff);_shakeOff.set(0,0,0);
-  if(camShake<=0.0005){camShake=0;return;}
-  camShake*=Math.pow(0.02,dt);
-  // 회전(roll)은 건드리지 않는다 — PointerLockControls가 카메라 쿼터니언에서 각도를
-  // 되읽기 때문에 roll을 넣으면 다음 마우스 이동에서 시야가 뒤집힌다.
-  _shakeOff.set((Math.random()-0.5)*camShake,(Math.random()-0.5)*camShake,(Math.random()-0.5)*camShake);
-  camera.position.add(_shakeOff);
-}
 function animate(){
   requestAnimationFrame(animate);
   // ── 일시정지 중이면 게임 로직 스킵, 렌더만 수행 ──
   if(gamePaused){renderer.render(scene,camera);return;}
   const now=performance.now(),dt=Math.min((now-lastT)/1000,0.05);lastT=now;
   const isPlaying=(ctrl.isLocked||mobileActive)&&!gameOver;
-  if(isPlaying){_adaptRes(dt);updatePlayer(dt);applyCamShake(dt);updateGunRecoil(dt);updateAim();updateTimers(dt);updateEnemies(dt);updateBullets(dt);updateEnemyBullets(dt);updateLaserBeams(dt);updateFX(dt);updateBuffItems(dt);updateGimmicks(dt);tickHitZone(dt);updateSkillHUD(dt);updateSkillFX(dt);updateDrone(dt);updateMines(dt);tickSkillNotify(dt);updatePlacePreview();}
+  if(isPlaying){_adaptRes(dt);updatePlayer(dt);updateGunRecoil(dt);updateAim();updateTimers(dt);updateEnemies(dt);updateBullets(dt);updateEnemyBullets(dt);updateLaserBeams(dt);updateFX(dt);updateBuffItems(dt);updateGimmicks(dt);tickHitZone(dt);updateSkillHUD(dt);updateSkillFX(dt);updateDrone(dt);updateMines(dt);tickSkillNotify(dt);updatePlacePreview();}
   if(camera.rotation.z!==0)camera.rotation.z=0;
   renderer.render(scene,camera);
 }
