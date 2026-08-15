@@ -2092,18 +2092,18 @@ const fireFl=document.getElementById('fire-flash');
 const xhEl=document.getElementById('crosshair');
 
 const WD={
-  pistol:  {n:'PISTOL',         k:'1',mag:18, rld:1.0,spd:55, dmg:1.2, spr:0.003, pel:1, cd:0.18,aFov:58,hFov:75,rcG:0.06, rcRX:0.08,bs:[0.04,0.04,0.15], bc:0xd4b06a,mdl:'pistol', auto:false},
-  smg:     {n:'SMG [AUTO]',     k:'2',mag:35, rld:1.3,spd:50, dmg:0.75,spr:0.011, pel:1, cd:0.07,aFov:62,hFov:75,rcG:0.03, rcRX:0.04,bs:[0.03,0.03,0.12], bc:0xffaa44,mdl:'smg',    auto:true},
-  ar:      {n:'RIFLE [AUTO]',   k:'3',mag:30, rld:1.6,spd:60, dmg:1.4, spr:0.005, pel:1, cd:0.09,aFov:56,hFov:75,rcG:0.05, rcRX:0.07,bs:[0.038,0.038,0.18],bc:0xcccccc,mdl:'ar',    auto:true},
-  shotgun: {n:'SHOTGUN',        k:'4',mag:8,  rld:1.6,spd:38, dmg:1.0, spr:0.042, pel:8, cd:0.65,aFov:63,hFov:75,rcG:0.13, rcRX:0.18,bs:[0.04,0.04,0.14], bc:0xffcc66,mdl:'shotgun',auto:false},
-  sniper:  {n:'SNIPER RIFLE',   k:'5',mag:5,  rld:2.2,spd:120,dmg:5.0, spr:0.0002,pel:1, cd:1.0, aFov:18,hFov:75,rcG:0.18, rcRX:0.25,bs:[0.028,0.028,0.26],bc:0xcfcfcf,mdl:'sniper',auto:false,scope:true},
-  revolver:{n:'REVOLVER',       k:'6',mag:6,  rld:1.8,spd:68, dmg:2.8, spr:0.002, pel:1, cd:0.40,aFov:56,hFov:75,rcG:0.10, rcRX:0.14,bs:[0.048,0.048,0.18],bc:0xbb8833,mdl:'revolver',auto:false},
-  lmg:     {n:'LMG [AUTO]',     k:'7',mag:80, rld:3.5,spd:52, dmg:1.6, spr:0.018, pel:1, cd:0.085,aFov:58,hFov:75,rcG:0.05,rcRX:0.06,bs:[0.042,0.042,0.18], bc:0xff8844,mdl:'lmg',    auto:true},
-  dmr:     {n:'DMR',            k:'8',mag:12, rld:1.6,spd:90, dmg:3.2, spr:0.001, pel:1, cd:0.32,aFov:38,hFov:75,rcG:0.09, rcRX:0.13,bs:[0.032,0.032,0.22],bc:0x88aaff,mdl:'dmr',auto:false},
-  laser:   {n:'LASER [AUTO]',   k:'9',mag:25, rld:1.8,spd:0,  dmg:2.5, spr:0.000, pel:1, cd:0.12,aFov:52,hFov:75,rcG:0.02, rcRX:0.025,bs:[0.025,0.025,0.35],bc:0x00ffff,mdl:'laser',auto:true,isLaser:true},
-  plasma:  {n:'PLASMA GUN',    k:'0',mag:6,  rld:2.0,spd:45, dmg:4.5, spr:0.008, pel:1, cd:0.80,aFov:60,hFov:75,rcG:0.16, rcRX:0.22,bs:[0.055,0.055,0.16],bc:0xff44ff,mdl:'plasma',auto:false,isSplash:true},
-  minigun: {n:'MINIGUN [AUTO]', k:'Q',mag:200,rld:4.5,spd:60, dmg:0.7, spr:0.020, pel:1, cd:0.038,aFov:65,hFov:75,rcG:0.02,rcRX:0.025,bs:[0.034,0.034,0.13],bc:0xff4444,mdl:'minigun',auto:true},
-  crossbow:{n:'CROSSBOW',       k:'E',mag:1,  rld:2.2,spd:100,dmg:6.0, spr:0.000, pel:1, cd:2.2, aFov:48,hFov:75,rcG:0.11, rcRX:0.15,bs:[0.04,0.018,0.32], bc:0x44ff88,mdl:'crossbow',auto:false},
+  pistol:  {n:'PISTOL',         k:'1',mag:18, rld:1.0,spd:55, dmg:1.06, spr:0.003, pel:1, cd:0.18,aFov:58,hFov:75,rcG:0.06, rcRX:0.08,bs:[0.04,0.04,0.15], bc:0xd4b06a,mdl:'pistol', auto:false},
+  smg:     {n:'SMG [AUTO]',     k:'2',mag:35, rld:1.3,spd:50, dmg:0.66,spr:0.011, pel:1, cd:0.07,aFov:62,hFov:75,rcG:0.03, rcRX:0.04,bs:[0.03,0.03,0.12], bc:0xffaa44,mdl:'smg',    auto:true},
+  ar:      {n:'RIFLE [AUTO]',   k:'3',mag:30, rld:1.6,spd:60, dmg:1.23, spr:0.005, pel:1, cd:0.09,aFov:56,hFov:75,rcG:0.05, rcRX:0.07,bs:[0.038,0.038,0.18],bc:0xcccccc,mdl:'ar',    auto:true},
+  shotgun: {n:'SHOTGUN',        k:'4',mag:8,  rld:1.6,spd:38, dmg:0.88, spr:0.042, pel:8, cd:0.65,aFov:63,hFov:75,rcG:0.13, rcRX:0.18,bs:[0.04,0.04,0.14], bc:0xffcc66,mdl:'shotgun',auto:false},
+  sniper:  {n:'SNIPER RIFLE',   k:'5',mag:5,  rld:2.2,spd:120,dmg:4.4, spr:0.0002,pel:1, cd:1.0, aFov:18,hFov:75,rcG:0.18, rcRX:0.25,bs:[0.028,0.028,0.26],bc:0xcfcfcf,mdl:'sniper',auto:false,scope:true},
+  revolver:{n:'REVOLVER',       k:'6',mag:6,  rld:1.8,spd:68, dmg:2.46, spr:0.002, pel:1, cd:0.40,aFov:56,hFov:75,rcG:0.10, rcRX:0.14,bs:[0.048,0.048,0.18],bc:0xbb8833,mdl:'revolver',auto:false},
+  lmg:     {n:'LMG [AUTO]',     k:'7',mag:80, rld:3.5,spd:52, dmg:1.41, spr:0.018, pel:1, cd:0.085,aFov:58,hFov:75,rcG:0.05,rcRX:0.06,bs:[0.042,0.042,0.18], bc:0xff8844,mdl:'lmg',    auto:true},
+  dmr:     {n:'DMR',            k:'8',mag:12, rld:1.6,spd:90, dmg:2.82, spr:0.001, pel:1, cd:0.32,aFov:38,hFov:75,rcG:0.09, rcRX:0.13,bs:[0.032,0.032,0.22],bc:0x88aaff,mdl:'dmr',auto:false},
+  laser:   {n:'LASER [AUTO]',   k:'9',mag:25, rld:1.8,spd:0,  dmg:2.2, spr:0.000, pel:1, cd:0.12,aFov:52,hFov:75,rcG:0.02, rcRX:0.025,bs:[0.025,0.025,0.35],bc:0x00ffff,mdl:'laser',auto:true,isLaser:true},
+  plasma:  {n:'PLASMA GUN',    k:'0',mag:6,  rld:2.0,spd:45, dmg:3.96, spr:0.008, pel:1, cd:0.80,aFov:60,hFov:75,rcG:0.16, rcRX:0.22,bs:[0.055,0.055,0.16],bc:0xff44ff,mdl:'plasma',auto:false,isSplash:true},
+  minigun: {n:'MINIGUN [AUTO]', k:'Q',mag:200,rld:4.5,spd:60, dmg:0.62, spr:0.020, pel:1, cd:0.038,aFov:65,hFov:75,rcG:0.02,rcRX:0.025,bs:[0.034,0.034,0.13],bc:0xff4444,mdl:'minigun',auto:true},
+  crossbow:{n:'CROSSBOW',       k:'E',mag:1,  rld:2.2,spd:100,dmg:5.28, spr:0.000, pel:1, cd:2.2, aFov:48,hFov:75,rcG:0.11, rcRX:0.15,bs:[0.04,0.018,0.32], bc:0x44ff88,mdl:'crossbow',auto:false},
 };
 const WKEYS=Object.keys(WD);
 
@@ -4097,7 +4097,7 @@ function applyBuff(type){
 
 const enemies=[],bullets=[],parts=[],enemyBullets=[];
 let playerHP=100,gameOver=false;
-function eMaxHP(){const base=3+Math.floor((stageWaveNum-1)*0.6);return base*getCurStage().hpMult;}
+function eMaxHP(){const base=4+Math.floor((stageWaveNum-1)*1.0);return base*getCurStage().hpMult;}
 
 // ══════════════════════════════════════════════════════
 //  ENEMY TYPE SYSTEM (다양한 적 종류)
@@ -4152,11 +4152,7 @@ function spawnEnemyBullet(from,to,speed,damage,color,size,isSplash){
   if(dir.lengthSq()<0.001)return;
   dir.normalize();
   b.userData={vel:dir.multiplyScalar(speed),damage,life:4,isSplash:!!isSplash,color:color||0xff4444};
-  // 작은 발광 트레일용 컬러 매터리얼 — 광원은 비싸므로 큰 발사체에만 추가
-  if(isSplash||(damage>=15)){
-    const pl=new THREE.PointLight(color||0xff4444,2,5,2);
-    b.add(pl);
-  }
+  // 발사체에는 광원을 달지 않는다 — 동적 광원은 매번 셰이더를 재컴파일시켜 끊김을 만든다
   scene.add(b);enemyBullets.push(b);
 }
 
@@ -4284,7 +4280,6 @@ function makeEnemy(type,variant){
     bomb.position.set(0,2.5,-0.45);g.add(bomb);
     const wick=new THREE.Mesh(new THREE.SphereGeometry(0.1,5,5),new THREE.MeshBasicMaterial({color:0xffff44}));
     wick.position.set(0,3.0,-0.45);g.add(wick);
-    const pl=new THREE.PointLight(0xff6600,2.5,5,2);pl.position.set(0,2.5,-0.45);g.add(pl);
   } else if(type==='tank'){
     const helm=new THREE.Mesh(new THREE.BoxGeometry(0.80,0.30,0.78),am);helm.position.set(0,3.66,0);g.add(helm);
     const lp=new THREE.Mesh(new THREE.BoxGeometry(0.34,0.30,0.78),am);lp.position.set(-0.50,2.20,0);g.add(lp);
@@ -4366,7 +4361,7 @@ function spawnEnemy(){
   // 처치 목표 달성 시 스폰 중단
   if(waveKills>=waveTarget)return;
   // 동시 적 수 제한 — 너무 많아지면 렉 발생
-  const maxConcurrent=16+Math.min(stageWaveNum,8); // 16~24
+  const maxConcurrent=18+Math.min(stageWaveNum*2,10); // 18~28
   if(enemies.length>=maxConcurrent)return;
   const e=makeEnemy(pickEnemyType());let ok=false,t2=0;
   while(!ok&&t2<40){const ang=Math.random()*Math.PI*2,d=50+Math.random()*100;const ex=Math.cos(ang)*d,ez=Math.sin(ang)*d;if(Math.abs(ex)<LIM-5&&Math.abs(ez)<LIM-5&&!isBlocked(ex,ez,1.5)){e.position.set(ex,0,ez);ok=true;}t2++;}
@@ -4588,13 +4583,13 @@ function showStageSelect(){
 // 업그레이드가 겹겹이 쌓여 후반에 무적이 되는 것을 막는 상한선.
 // (스킬의 일시 버프는 원래 값으로 되돌리므로 여기서 건드리지 않는다)
 function clampMods(){
-  mods.dmgMult=Math.min(mods.dmgMult,4.0);
-  mods.armorMult=Math.max(mods.armorMult,0.30);
-  mods.fireRateMult=Math.max(mods.fireRateMult,0.55);
-  mods.speedMult=Math.min(mods.speedMult,1.6);
-  mods.magMult=Math.min(mods.magMult,2.5);
-  mods.regenRate=Math.min(mods.regenRate,3);
-  mods.lifeSteal=Math.min(mods.lifeSteal,4);
+  mods.dmgMult=Math.min(mods.dmgMult,2.8);
+  mods.armorMult=Math.max(mods.armorMult,0.45);
+  mods.fireRateMult=Math.max(mods.fireRateMult,0.65);
+  mods.speedMult=Math.min(mods.speedMult,1.4);
+  mods.magMult=Math.min(mods.magMult,2.0);
+  mods.regenRate=Math.min(mods.regenRate,2);
+  mods.lifeSteal=Math.min(mods.lifeSteal,3);
   mods.critChance=Math.min(mods.critChance,0.6);
   mods.thorns=Math.min(mods.thorns,14);
   mods.splashRad=Math.min(mods.splashRad,1.7);
@@ -4648,22 +4643,22 @@ function makeBullet(wd){
 const laserBeams=[];
 
 const STAGES=[
-  {id:1, name:'훈련장',     sub:'TRAINING GROUND',    icon:'🏕️', waves:3,waveBase:6, diff:1,hpMult:0.7, spawnBase:2200,spd:3.0,weapons:['pistol','smg'],                                                    fogColor:0x0a1408,fogNear:60,fogFar:450,ambCol:0x5a6850,desc:'기초 훈련 구역. 기본 무기만 지급.'},
-  {id:2, name:'도시 골목',  sub:'URBAN ALLEY',         icon:'🏘️', waves:3,waveBase:8, diff:1,hpMult:0.9, spawnBase:2000,spd:3.5,weapons:['pistol','smg','ar'],                                               fogColor:0x080c11,fogNear:50,fogFar:400,ambCol:0x606878,desc:'콘크리트 골목. 근·중거리 교전.'},
-  {id:3, name:'산업 단지',  sub:'INDUSTRIAL ZONE',     icon:'🏭', waves:4,waveBase:10,diff:2,hpMult:1.1, spawnBase:1800,spd:3.8,weapons:['pistol','smg','ar','shotgun'],                                     fogColor:0x110e06,fogNear:45,fogFar:380,ambCol:0x706050,desc:'공장 지대. 짧은 사거리 전투.'},
-  {id:4, name:'항구',       sub:'HARBOR',              icon:'⚓', waves:4,waveBase:12,diff:2,hpMult:1.2, spawnBase:1700,spd:4.0,weapons:['ar','smg','revolver','sniper'],                                    fogColor:0x060e16,fogNear:40,fogFar:350,ambCol:0x405070,desc:'안개 낀 항구. 원거리 우위.'},
-  {id:5, name:'야간 정글',  sub:'NIGHT JUNGLE',        icon:'🌙', waves:4,waveBase:13,diff:3,hpMult:1.4, spawnBase:1500,spd:4.5,weapons:['ar','shotgun','smg','sniper','dmr'],                              fogColor:0x010804,fogNear:25,fogFar:200,ambCol:0x203018,desc:'칠흑 속 정글. 시야 극히 제한.'},
-  {id:6, name:'핵 발전소',  sub:'NUCLEAR PLANT',       icon:'☢️', waves:4,waveBase:15,diff:3,hpMult:1.6, spawnBase:1400,spd:4.8,weapons:['ar','dmr','lmg','sniper','revolver'],                              fogColor:0x0a1a08,fogNear:35,fogFar:300,ambCol:0x3a6030,desc:'방사능 오염 구역. 중화기 해금.'},
-  {id:7, name:'군사 기지',  sub:'MILITARY BASE',       icon:'🪖', waves:5,waveBase:16,diff:4,hpMult:1.8, spawnBase:1300,spd:5.2,weapons:['ar','dmr','lmg','smg','sniper','shotgun','revolver'],              fogColor:0x080c11,fogNear:45,fogFar:380,ambCol:0x506070,desc:'중무장 엘리트 부대. 중화기 전투.'},
-  {id:8, name:'폐허 도시',  sub:'RUINED CITY',         icon:'🏚️', waves:5,waveBase:18,diff:4,hpMult:2.0, spawnBase:1200,spd:5.5,weapons:['ar','dmr','lmg','sniper','minigun','laser'],                       fogColor:0x120808,fogNear:35,fogFar:280,ambCol:0x704040,desc:'폐허가 된 도시. 돌아오지 못할 수도.'},
-  {id:9, name:'요새',       sub:'FORTRESS',            icon:'🏰', waves:5,waveBase:20,diff:4,hpMult:2.3, spawnBase:1100,spd:5.8,weapons:['ar','dmr','lmg','sniper','minigun','laser','crossbow'],             fogColor:0x0a0a1a,fogNear:40,fogFar:340,ambCol:0x404060,desc:'난공불락 요새. 최정예 부대가 지킨다.'},
-  {id:10,name:'극지 작전',  sub:'ARCTIC OPS',          icon:'❄️', waves:5,waveBase:22,diff:5,hpMult:2.6, spawnBase:1000,spd:6.2,weapons:['sniper','lmg','minigun','dmr','laser'],                            fogColor:0x0c1820,fogNear:30,fogFar:250,ambCol:0x607080,desc:'극한 환경. 스나이퍼·중화기만 사용 가능.'},
-  {id:11,name:'지하 벙커',  sub:'UNDERGROUND BUNKER',  icon:'🕳️', waves:6,waveBase:25,diff:5,hpMult:3.0, spawnBase:900, spd:6.8,weapons:['shotgun','smg','plasma','minigun','lmg','ar','dmr','laser','crossbow'],fogColor:0x050508,fogNear:20,fogFar:180,ambCol:0x302835,desc:'탈출구 없는 지하 벙커. 근접전 지옥.'},
-  {id:12,name:'최후의 전투',sub:'FINAL STAND',          icon:'💀', waves:6,waveBase:30,diff:5,hpMult:3.8, spawnBase:750, spd:7.5,weapons:['pistol','smg','ar','shotgun','sniper','revolver','lmg','dmr','laser','plasma','minigun','crossbow'],fogColor:0x140005,fogNear:35,fogFar:280,ambCol:0x603040,desc:'지옥의 최전선. 모든 무기. 살아남아라.'},
-  {id:13,name:'사막 폭풍',  sub:'DESERT STORM',          icon:'🏜️', waves:5,waveBase:24,diff:5,hpMult:3.2, spawnBase:900, spd:6.2,weapons:['ar','dmr','lmg','sniper','smg','revolver','shotgun'],                                  fogColor:0x3a2810,fogNear:35,fogFar:300,ambCol:0xa88860,desc:'끝없는 사막. 피라미드를 지키는 고대의 군단.'},
-  {id:14,name:'사이버 도시',sub:'CYBER CITY',            icon:'🌃', waves:5,waveBase:26,diff:5,hpMult:3.4, spawnBase:850, spd:6.8,weapons:['laser','plasma','dmr','ar','minigun','lmg','crossbow'],                          fogColor:0x080820,fogNear:35,fogFar:320,ambCol:0x4060a0,desc:'네온 빛 미래 도시. 자동화된 보안 무기가 전부.'},
-  {id:15,name:'수중 시설',  sub:'UNDERWATER FACILITY',   icon:'🌊', waves:5,waveBase:28,diff:5,hpMult:3.6, spawnBase:800, spd:6.0,weapons:['shotgun','smg','ar','dmr','sniper','laser'],                                    fogColor:0x041830,fogNear:28,fogFar:260,ambCol:0x305880,desc:'해저 깊숙한 연구 시설. 산소가 부족하다.'},
-  {id:16,name:'화산 분화구',sub:'VOLCANO CRATER',        icon:'🌋', waves:6,waveBase:32,diff:5,hpMult:4.2, spawnBase:700, spd:7.2,weapons:['pistol','smg','ar','shotgun','sniper','revolver','lmg','dmr','laser','plasma','minigun','crossbow'],fogColor:0x180404,fogNear:30,fogFar:260,ambCol:0x603020,desc:'끓는 용암 위의 분화구. 모든 게 불타고 있다.'},
+  {id:1, name:'훈련장',     sub:'TRAINING GROUND',    icon:'🏕️', waves:3,waveBase:6, diff:1,hpMult:0.88, spawnBase:2200,spd:3.0,weapons:['pistol','smg'],                                                    fogColor:0x0a1408,fogNear:60,fogFar:450,ambCol:0x5a6850,desc:'기초 훈련 구역. 기본 무기만 지급.'},
+  {id:2, name:'도시 골목',  sub:'URBAN ALLEY',         icon:'🏘️', waves:3,waveBase:8, diff:1,hpMult:1.12, spawnBase:2000,spd:3.5,weapons:['pistol','smg','ar'],                                               fogColor:0x080c11,fogNear:50,fogFar:400,ambCol:0x606878,desc:'콘크리트 골목. 근·중거리 교전.'},
+  {id:3, name:'산업 단지',  sub:'INDUSTRIAL ZONE',     icon:'🏭', waves:4,waveBase:10,diff:2,hpMult:1.38, spawnBase:1800,spd:3.8,weapons:['pistol','smg','ar','shotgun'],                                     fogColor:0x110e06,fogNear:45,fogFar:380,ambCol:0x706050,desc:'공장 지대. 짧은 사거리 전투.'},
+  {id:4, name:'항구',       sub:'HARBOR',              icon:'⚓', waves:4,waveBase:12,diff:2,hpMult:1.5, spawnBase:1700,spd:4.0,weapons:['ar','smg','revolver','sniper'],                                    fogColor:0x060e16,fogNear:40,fogFar:350,ambCol:0x405070,desc:'안개 낀 항구. 원거리 우위.'},
+  {id:5, name:'야간 정글',  sub:'NIGHT JUNGLE',        icon:'🌙', waves:4,waveBase:13,diff:3,hpMult:1.75, spawnBase:1500,spd:4.5,weapons:['ar','shotgun','smg','sniper','dmr'],                              fogColor:0x010804,fogNear:25,fogFar:200,ambCol:0x203018,desc:'칠흑 속 정글. 시야 극히 제한.'},
+  {id:6, name:'핵 발전소',  sub:'NUCLEAR PLANT',       icon:'☢️', waves:4,waveBase:15,diff:3,hpMult:2, spawnBase:1400,spd:4.8,weapons:['ar','dmr','lmg','sniper','revolver'],                              fogColor:0x0a1a08,fogNear:35,fogFar:300,ambCol:0x3a6030,desc:'방사능 오염 구역. 중화기 해금.'},
+  {id:7, name:'군사 기지',  sub:'MILITARY BASE',       icon:'🪖', waves:5,waveBase:16,diff:4,hpMult:2.25, spawnBase:1300,spd:5.2,weapons:['ar','dmr','lmg','smg','sniper','shotgun','revolver'],              fogColor:0x080c11,fogNear:45,fogFar:380,ambCol:0x506070,desc:'중무장 엘리트 부대. 중화기 전투.'},
+  {id:8, name:'폐허 도시',  sub:'RUINED CITY',         icon:'🏚️', waves:5,waveBase:18,diff:4,hpMult:2.5, spawnBase:1200,spd:5.5,weapons:['ar','dmr','lmg','sniper','minigun','laser'],                       fogColor:0x120808,fogNear:35,fogFar:280,ambCol:0x704040,desc:'폐허가 된 도시. 돌아오지 못할 수도.'},
+  {id:9, name:'요새',       sub:'FORTRESS',            icon:'🏰', waves:5,waveBase:20,diff:4,hpMult:2.88, spawnBase:1100,spd:5.8,weapons:['ar','dmr','lmg','sniper','minigun','laser','crossbow'],             fogColor:0x0a0a1a,fogNear:40,fogFar:340,ambCol:0x404060,desc:'난공불락 요새. 최정예 부대가 지킨다.'},
+  {id:10,name:'극지 작전',  sub:'ARCTIC OPS',          icon:'❄️', waves:5,waveBase:22,diff:5,hpMult:3.25, spawnBase:1000,spd:6.2,weapons:['sniper','lmg','minigun','dmr','laser'],                            fogColor:0x0c1820,fogNear:30,fogFar:250,ambCol:0x607080,desc:'극한 환경. 스나이퍼·중화기만 사용 가능.'},
+  {id:11,name:'지하 벙커',  sub:'UNDERGROUND BUNKER',  icon:'🕳️', waves:6,waveBase:25,diff:5,hpMult:3.75, spawnBase:900, spd:6.8,weapons:['shotgun','smg','plasma','minigun','lmg','ar','dmr','laser','crossbow'],fogColor:0x050508,fogNear:20,fogFar:180,ambCol:0x302835,desc:'탈출구 없는 지하 벙커. 근접전 지옥.'},
+  {id:12,name:'최후의 전투',sub:'FINAL STAND',          icon:'💀', waves:6,waveBase:30,diff:5,hpMult:4.75, spawnBase:750, spd:7.5,weapons:['pistol','smg','ar','shotgun','sniper','revolver','lmg','dmr','laser','plasma','minigun','crossbow'],fogColor:0x140005,fogNear:35,fogFar:280,ambCol:0x603040,desc:'지옥의 최전선. 모든 무기. 살아남아라.'},
+  {id:13,name:'사막 폭풍',  sub:'DESERT STORM',          icon:'🏜️', waves:5,waveBase:24,diff:5,hpMult:4, spawnBase:900, spd:6.2,weapons:['ar','dmr','lmg','sniper','smg','revolver','shotgun'],                                  fogColor:0x3a2810,fogNear:35,fogFar:300,ambCol:0xa88860,desc:'끝없는 사막. 피라미드를 지키는 고대의 군단.'},
+  {id:14,name:'사이버 도시',sub:'CYBER CITY',            icon:'🌃', waves:5,waveBase:26,diff:5,hpMult:4.25, spawnBase:850, spd:6.8,weapons:['laser','plasma','dmr','ar','minigun','lmg','crossbow'],                          fogColor:0x080820,fogNear:35,fogFar:320,ambCol:0x4060a0,desc:'네온 빛 미래 도시. 자동화된 보안 무기가 전부.'},
+  {id:15,name:'수중 시설',  sub:'UNDERWATER FACILITY',   icon:'🌊', waves:5,waveBase:28,diff:5,hpMult:4.5, spawnBase:800, spd:6.0,weapons:['shotgun','smg','ar','dmr','sniper','laser'],                                    fogColor:0x041830,fogNear:28,fogFar:260,ambCol:0x305880,desc:'해저 깊숙한 연구 시설. 산소가 부족하다.'},
+  {id:16,name:'화산 분화구',sub:'VOLCANO CRATER',        icon:'🌋', waves:6,waveBase:32,diff:5,hpMult:5.25, spawnBase:700, spd:7.2,weapons:['pistol','smg','ar','shotgun','sniper','revolver','lmg','dmr','laser','plasma','minigun','crossbow'],fogColor:0x180404,fogNear:30,fogFar:260,ambCol:0x603020,desc:'끓는 용암 위의 분화구. 모든 게 불타고 있다.'},
 ];
 let currentStageId=1,stageWaveNum=1;
 let pickedUpgrades=[]; // 현재 스테이지에서 선택한 업그레이드 ID 목록 (이어하기 시 재적용)
@@ -5153,7 +5148,7 @@ function updateEnemies(dt){
     if(behavior==='bomb'&&dist<2.6&&Math.abs(yawObj.position.y-EYH)<3.5){
       // 자폭
       spawnExplosionFX(e.position.clone().setY(1.5));
-      playerHP-=25*mods.armorMult;
+      playerHP-=34*mods.armorMult;
       if(playerHP<0)playerHP=0;hpBar.style.width=playerHP+'%';
       hitFl.style.background='rgba(255,80,0,0.45)';setTimeout(()=>hitFl.style.background='rgba(255,0,0,0)',250);
       playSound('hurt');
@@ -5162,13 +5157,13 @@ function updateEnemies(dt){
       if(playerHP<=0){endGame();return;}
       continue;
     } else if(behavior==='melee'&&dist<2.3&&Math.abs(yawObj.position.y-EYH)<3.5){
-      const dmgRate=13*(ud.dmgMult||1);
+      const dmgRate=17*(ud.dmgMult||1);
       playerHP-=dmgRate*dt*mods.armorMult;if(playerHP<0)playerHP=0;hpBar.style.width=playerHP+'%';
       hitFl.style.background='rgba(255,0,0,0.2)';setTimeout(()=>hitFl.style.background='rgba(255,0,0,0)',120);playSound('hurt');
       if(mods.thorns>0)ud.hp-=mods.thorns*dt;
       if(playerHP<=0){endGame();return;}
     } else if((behavior==='midboss'||behavior==='boss')&&dist<3.8&&Math.abs(yawObj.position.y-EYH)<3.5){
-      const dmgRate=22*(ud.dmgMult||1);
+      const dmgRate=29*(ud.dmgMult||1);
       playerHP-=dmgRate*dt*mods.armorMult;if(playerHP<0)playerHP=0;hpBar.style.width=playerHP+'%';
       hitFl.style.background='rgba(255,0,0,0.3)';setTimeout(()=>hitFl.style.background='rgba(255,0,0,0)',150);playSound('hurt');
       if(mods.thorns>0)ud.hp-=mods.thorns*dt;
@@ -5296,7 +5291,7 @@ function spawnFX(pos){
   scene.add(flash);parts.push(flash);
 
   // 스파크 (빠르고 얇게)
-  for(let i=0;i<10;i++){
+  for(let i=0;i<6;i++){
     const p=_makeParticle('spark',i%3===0?0xffdd00:0xff6600,0.04);
     p.position.set(cx,cy+1.2+Math.random()*0.8,cz);
     const spd=6+Math.random()*10;
@@ -5306,7 +5301,7 @@ function spawnFX(pos){
     scene.add(p);parts.push(p);
   }
   // 핏방울 (붉은 구)
-  for(let i=0;i<8;i++){
+  for(let i=0;i<5;i++){
     const p=_makeParticle('blood',0xaa0000,0.06+Math.random()*0.07);
     p.position.set(cx+(Math.random()-0.5)*0.3,cy+1.0+Math.random()*1.2,cz+(Math.random()-0.5)*0.3);
     const spd=2+Math.random()*5;
@@ -6271,7 +6266,7 @@ function spawnExplosionFX(pos){
   flash.userData={vel:new THREE.Vector3(0,0.2,0),life:0.15,maxLife:0.15,type:'glow'};
   scene.add(flash);parts.push(flash);
   // 대량 스파크
-  for(let i=0;i<20;i++){
+  for(let i=0;i<12;i++){
     const p=_makeParticle('spark',i%3===0?0xffff00:i%3===1?0xff6600:0xff2200,0.05);
     p.position.set(cx+(Math.random()-0.5)*0.5,cy+0.3+Math.random()*0.5,cz+(Math.random()-0.5)*0.5);
     const spd=6+Math.random()*14,ang=Math.random()*Math.PI*2,elev=(Math.random()*0.8+0.1)*Math.PI;
@@ -6296,7 +6291,7 @@ function spawnExplosionFX(pos){
 }
 
 // 파티클 업데이트 (공통)
-const _PARTICLE_MAX=260;
+const _PARTICLE_MAX=150;
 function _updateParticleArray(arr, dt){
   // 한계 초과 시 가장 오래된 파티클부터 제거 (FIFO 컬링)
   if(arr.length>_PARTICLE_MAX){
@@ -6405,8 +6400,8 @@ function updateSkillFX(dt){_updateParticleArray(skillFX,dt);}
 // ══════════════════════════════════════════════════════
 
 const ZONES=[
-  {name:'HEAD',  mult:3.0,css:'headshot',label:'💥 HEADSHOT!',test:(lx,ly,lz)=>ly>=3.00&&ly<=3.78&&Math.abs(lx)<0.40&&Math.abs(lz)<0.40},
-  {name:'CHEST', mult:1.2,css:'bodyshot',label:'CHEST',        test:(lx,ly,lz)=>ly>=2.40&&ly<3.00&&Math.abs(lx)<0.54&&Math.abs(lz)<0.34},
+  {name:'HEAD',  mult:2.5,css:'headshot',label:'💥 HEADSHOT!',test:(lx,ly,lz)=>ly>=3.00&&ly<=3.78&&Math.abs(lx)<0.40&&Math.abs(lz)<0.40},
+  {name:'CHEST', mult:1.1,css:'bodyshot',label:'CHEST',        test:(lx,ly,lz)=>ly>=2.40&&ly<3.00&&Math.abs(lx)<0.54&&Math.abs(lz)<0.34},
   {name:'TORSO', mult:1.0,css:'bodyshot',label:'BODY',         test:(lx,ly,lz)=>ly>=1.55&&ly<2.40&&Math.abs(lx)<0.54&&Math.abs(lz)<0.34},
   {name:'L_ARM', mult:0.70,css:'armshot',label:'ARM',          test:(lx,ly,lz)=>ly>=1.50&&ly<2.80&&lx>=-0.95&&lx<=-0.34&&Math.abs(lz)<0.26},
   {name:'R_ARM', mult:0.70,css:'armshot',label:'ARM',          test:(lx,ly,lz)=>ly>=1.50&&ly<2.80&&lx>=0.34&&lx<=0.95&&Math.abs(lz)<0.26},
@@ -6437,13 +6432,25 @@ function updateLaserBeams(dt){
   }
 }
 
+// ── 적응형 해상도: 최근 1초 평균 FPS에 따라 렌더 배율을 조절해 끊김을 줄인다 ──
+let _fpsFrames=0,_fpsT=0,_resScale=Math.min(devicePixelRatio,1.25);
+function _adaptRes(dt){
+  _fpsFrames++;_fpsT+=dt;
+  if(_fpsT<1)return;
+  const fps=_fpsFrames/_fpsT;_fpsFrames=0;_fpsT=0;
+  const min=0.6,max=Math.min(devicePixelRatio,1.25);
+  let next=_resScale;
+  if(fps<45)next=Math.max(min,_resScale-0.15);
+  else if(fps>58)next=Math.min(max,_resScale+0.1);
+  if(Math.abs(next-_resScale)>0.01){_resScale=next;renderer.setPixelRatio(_resScale);}
+}
 function animate(){
   requestAnimationFrame(animate);
   // ── 일시정지 중이면 게임 로직 스킵, 렌더만 수행 ──
   if(gamePaused){renderer.render(scene,camera);return;}
   const now=performance.now(),dt=Math.min((now-lastT)/1000,0.05);lastT=now;
   const isPlaying=(ctrl.isLocked||mobileActive)&&!gameOver;
-  if(isPlaying){updatePlayer(dt);updateGunRecoil(dt);updateAim();updateTimers(dt);updateEnemies(dt);updateBullets(dt);updateEnemyBullets(dt);updateLaserBeams(dt);updateFX(dt);updateBuffItems(dt);updateGimmicks(dt);tickHitZone(dt);updateSkillHUD(dt);updateSkillFX(dt);updateDrone(dt);updateMines(dt);tickSkillNotify(dt);updatePlacePreview();}
+  if(isPlaying){_adaptRes(dt);updatePlayer(dt);updateGunRecoil(dt);updateAim();updateTimers(dt);updateEnemies(dt);updateBullets(dt);updateEnemyBullets(dt);updateLaserBeams(dt);updateFX(dt);updateBuffItems(dt);updateGimmicks(dt);tickHitZone(dt);updateSkillHUD(dt);updateSkillFX(dt);updateDrone(dt);updateMines(dt);tickSkillNotify(dt);updatePlacePreview();}
   renderer.render(scene,camera);
 }
 window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
