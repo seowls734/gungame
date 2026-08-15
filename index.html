@@ -5173,9 +5173,38 @@ function updateEnemies(dt){
     }
   }
 }
+// 총알의 이번 프레임 이동 구간이 적의 XZ 기둥을 지나가는지 검사하고,
+// 지나간다면 그 구간에서 가장 좋은 부위(머리 우선)의 명중 지점을 돌려준다.
+const _swA=new THREE.Vector3(),_swB=new THREE.Vector3(),_swP=new THREE.Vector3();
+function sweepHitZone(p0,p1,ex,ez,hbXZ,hbYMax,escl){
+  const dx=p1.x-p0.x,dz=p1.z-p0.z;
+  let t0=0,t1=1;
+  // XZ 각 축에서 기둥 안에 있는 구간(t)을 구한다
+  for(const [d,o,c] of [[dx,p0.x,ex],[dz,p0.z,ez]]){
+    if(Math.abs(d)<1e-6){ if(Math.abs(o-c)>=hbXZ)return null; continue; }
+    let a=(c-hbXZ-o)/d, bb=(c+hbXZ-o)/d;
+    if(a>bb){const tmp=a;a=bb;bb=tmp;}
+    t0=Math.max(t0,a);t1=Math.min(t1,bb);
+    if(t0>t1)return null;
+  }
+  // 구간을 몇 지점 찍어보고 가장 우선순위 높은 부위(머리 → 가슴 → …)를 채택
+  let best=null,bestIdx=99,bestPos=null;
+  for(let k=0;k<=4;k++){
+    const t=t0+(t1-t0)*(k/4);
+    _swP.set(p0.x+dx*t,p0.y+(p1.y-p0.y)*t,p0.z+dz*t);
+    if(_swP.y<0||_swP.y>=hbYMax)continue;
+    const z=getHitZone(_swP,{x:ex,z:ez},escl);
+    const idx=ZONES.indexOf(z);
+    if(idx<bestIdx){bestIdx=idx;best=z;bestPos=_swP.clone();}
+  }
+  return best?{zone:best,pos:bestPos}:null;
+}
 function updateBullets(dt){
   for(let i=bullets.length-1;i>=0;i--){
-    const b=bullets[i];b.position.addScaledVector(b.userData.vel,dt);b.userData.life+=dt;
+    const b=bullets[i];
+    _swA.copy(b.position);                       // 이동 전 위치
+    b.position.addScaledVector(b.userData.vel,dt);b.userData.life+=dt;
+    _swB.copy(b.position);                       // 이동 후 위치
     let rm=false;
     // 적 히트 체크를 먼저 — 벽 뒤에서 머리가 삐져나온 적도 맞을 수 있도록
     for(let j=enemies.length-1;j>=0;j--){
@@ -5185,8 +5214,9 @@ function updateBullets(dt){
       const isBoss=ud&&(ud.isBoss||ud.isMidBoss);
       const hbXZ=(isBoss?1.7:1.1)*escl;
       const hbYMax=(isBoss?5.4:4.2)*escl;
-      if(Math.abs(b.position.x-e.position.x)<hbXZ&&Math.abs(b.position.z-e.position.z)<hbXZ&&b.position.y>=0.0&&b.position.y<hbYMax){
-        const hz=getHitZone(b.position,e.position,escl);
+      const _sw=sweepHitZone(_swA,_swB,e.position.x,e.position.z,hbXZ,hbYMax,escl);
+      if(_sw){
+        const hz=_sw.zone;
         const _bCrit=mods.critChance>0&&Math.random()<mods.critChance?1.8:1;
         const _bBrsk=mods._berserker&&playerHP<=40?1.8:1;
         const _bOneShot=mods._nextOneShot?6:1;
@@ -6448,8 +6478,9 @@ function updateSkillFX(dt){_updateParticleArray(skillFX,dt);}
 // ══════════════════════════════════════════════════════
 
 const ZONES=[
-  {name:'HEAD',  mult:2.5,css:'headshot',label:'💥 HEADSHOT!',test:(lx,ly,lz)=>ly>=3.00&&ly<=3.78&&Math.abs(lx)<0.40&&Math.abs(lz)<0.40},
-  {name:'CHEST', mult:1.1,css:'bodyshot',label:'CHEST',        test:(lx,ly,lz)=>ly>=2.40&&ly<3.00&&Math.abs(lx)<0.54&&Math.abs(lz)<0.34},
+  // 머리 판정은 실제 머리 모델보다 넉넉하게 잡는다 (조준 스트레스를 줄이기 위한 의도적 관대함)
+  {name:'HEAD',  mult:2.5,css:'headshot',label:'💥 HEADSHOT!',test:(lx,ly,lz)=>ly>=2.86&&ly<=4.05&&Math.abs(lx)<0.56&&Math.abs(lz)<0.52},
+  {name:'CHEST', mult:1.1,css:'bodyshot',label:'CHEST',        test:(lx,ly,lz)=>ly>=2.40&&ly<2.86&&Math.abs(lx)<0.54&&Math.abs(lz)<0.34},
   {name:'TORSO', mult:1.0,css:'bodyshot',label:'BODY',         test:(lx,ly,lz)=>ly>=1.55&&ly<2.40&&Math.abs(lx)<0.54&&Math.abs(lz)<0.34},
   {name:'L_ARM', mult:0.70,css:'armshot',label:'ARM',          test:(lx,ly,lz)=>ly>=1.50&&ly<2.80&&lx>=-0.95&&lx<=-0.34&&Math.abs(lz)<0.26},
   {name:'R_ARM', mult:0.70,css:'armshot',label:'ARM',          test:(lx,ly,lz)=>ly>=1.50&&ly<2.80&&lx>=0.34&&lx<=0.95&&Math.abs(lz)<0.26},
