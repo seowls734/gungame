@@ -6506,6 +6506,8 @@ function _adaptRes(dt){
 // 그래서 매 프레임 이전 흔들림 오프셋을 먼저 되돌린 뒤 새 오프셋을 더한다.
 const _shakeOff=new THREE.Vector3();
 function applyCamShake(dt){
+  // 예전 버전에서 남아 있을 수 있는 기울기(roll)를 매 프레임 확실히 0으로 되돌린다
+  if(camera.rotation.z!==0)camera.rotation.z=0;
   camera.position.sub(_shakeOff);_shakeOff.set(0,0,0);
   if(camShake<=0.0005){camShake=0;return;}
   camShake*=Math.pow(0.02,dt);
@@ -6521,6 +6523,7 @@ function animate(){
   const now=performance.now(),dt=Math.min((now-lastT)/1000,0.05);lastT=now;
   const isPlaying=(ctrl.isLocked||mobileActive)&&!gameOver;
   if(isPlaying){_adaptRes(dt);updatePlayer(dt);applyCamShake(dt);updateGunRecoil(dt);updateAim();updateTimers(dt);updateEnemies(dt);updateBullets(dt);updateEnemyBullets(dt);updateLaserBeams(dt);updateFX(dt);updateBuffItems(dt);updateGimmicks(dt);tickHitZone(dt);updateSkillHUD(dt);updateSkillFX(dt);updateDrone(dt);updateMines(dt);tickSkillNotify(dt);updatePlacePreview();}
+  if(camera.rotation.z!==0)camera.rotation.z=0;
   renderer.render(scene,camera);
 }
 window.addEventListener('resize',()=>{camera.aspect=innerWidth/innerHeight;camera.updateProjectionMatrix();renderer.setSize(innerWidth,innerHeight);});
