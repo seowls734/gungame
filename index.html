@@ -2525,7 +2525,7 @@ function addTree(x,z,h,trunkCol,foliageCol){
     const cone=new THREE.Mesh(new THREE.ConeGeometry(r,2.2,6),new THREE.MeshStandardMaterial({color:foliageCol,roughness:0.85,flatShading:true}));
     cone.position.set(x,h*0.6+i*1.1,z);scene.add(cone);mapMeshes.push(cone); // 잎은 castShadow OFF
   }
-  OBST.push({x,z,hw:0.35,hd:0.35});
+  OBST.push({x,z,hw:0.35,hd:0.35,yMin:0,yMax:h});
 }
 function addBroadleaf(x,z,h,trunkCol,foliageCol){
   h=h||4.5;trunkCol=trunkCol||0x4a3220;foliageCol=foliageCol||0x2a4a18;
@@ -2540,7 +2540,7 @@ function addBroadleaf(x,z,h,trunkCol,foliageCol){
     const foliage=new THREE.Mesh(new THREE.SphereGeometry(fr,6,5),new THREE.MeshStandardMaterial({color:foliageCol,roughness:0.85,flatShading:true}));
     foliage.position.set(fx,fy,fz);scene.add(foliage);mapMeshes.push(foliage); // 잎 castShadow OFF
   }
-  OBST.push({x,z,hw:0.4,hd:0.4});
+  OBST.push({x,z,hw:0.4,hd:0.4,yMin:0,yMax:h});
 }
 function addDeadTree(x,z,h){
   h=h||5;
@@ -2554,7 +2554,7 @@ function addDeadTree(x,z,h){
     br.rotation.z=Math.cos(ang)*0.8;br.rotation.x=Math.sin(ang)*0.8;
     scene.add(br);mapMeshes.push(br); // 가지 castShadow OFF
   }
-  OBST.push({x,z,hw:0.25,hd:0.25});
+  OBST.push({x,z,hw:0.25,hd:0.25,yMin:0,yMax:h});
 }
 function addRock(x,z,scl,col){
   scl=scl||1;col=col||0x5a5a58;
@@ -2593,7 +2593,7 @@ function addContainer(x,z,rot,col){
   grp.children[0].castShadow=true;grp.children[0].receiveShadow=true;
   scene.add(grp);mapMeshes.push(grp);
   const cs=Math.abs(Math.cos(rot)),sn=Math.abs(Math.sin(rot));
-  OBST.push({x,z,hw:cs*3+sn*1.2,hd:sn*3+cs*1.2});
+  OBST.push({x,z,hw:cs*3+sn*1.2,hd:sn*3+cs*1.2,yMin:0,yMax:2.6});
 }
 function addContainerStack(x,z,rot){
   rot=rot||0;
@@ -2624,7 +2624,7 @@ function addWreck(x,z){
   const hood=new THREE.Mesh(new THREE.BoxGeometry(1.0,0.05,1.45),new THREE.MeshStandardMaterial({color:0x4a3018,roughness:0.95}));hood.position.set(1.0,0.95,0);hood.rotation.z=-0.1;grp.add(hood);
   grp.position.set(x,0,z);grp.rotation.y=Math.random()*Math.PI*2;
   scene.add(grp);mapMeshes.push(grp);
-  OBST.push({x,z,hw:1.5,hd:1.0});
+  OBST.push({x,z,hw:1.5,hd:1.0,yMin:0,yMax:1.75});
 }
 function addAntenna(x,z,h){
   h=h||14;
@@ -2650,7 +2650,7 @@ function addAntenna(x,z,h){
   }
   grp.position.set(x,0,z);
   scene.add(grp);mapMeshes.push(grp);
-  OBST.push({x,z,hw:0.75,hd:0.75});
+  OBST.push({x,z,hw:0.75,hd:0.75,yMin:0,yMax:h});
 }
 function addFence(x1,z1,x2,z2){
   const dx=x2-x1,dz=z2-z1;
@@ -2723,7 +2723,7 @@ function addSandbagWall(x,z,rot,len){
   grp.position.set(x,0,z);grp.rotation.y=rot;
   scene.add(grp);mapMeshes.push(grp);
   const cs=Math.abs(Math.cos(rot)),sn=Math.abs(Math.sin(rot));
-  OBST.push({x,z,hw:cs*len/2+sn*0.4,hd:sn*len/2+cs*0.4});
+  OBST.push({x,z,hw:cs*len/2+sn*0.4,hd:sn*len/2+cs*0.4,yMin:0,yMax:1.15});
 }
 function addBillboard(x,z,rot,col,emCol){
   rot=rot||0;col=col||0x2a2a2a;
@@ -2739,7 +2739,7 @@ function addBillboard(x,z,rot,col,emCol){
   }
   grp.position.set(x,0,z);grp.rotation.y=rot;
   scene.add(grp);mapMeshes.push(grp);
-  OBST.push({x,z,hw:0.5,hd:0.5});
+  OBST.push({x,z,hw:0.5,hd:0.5,yMin:0,yMax:6.3});
 }
 function addTombstone(x,z){
   const grp=new THREE.Group();
@@ -2783,7 +2783,7 @@ function addExplosiveBarrel(x,z){
   const top=new THREE.Mesh(new THREE.CylinderGeometry(0.5,0.55,0.08,10),new THREE.MeshStandardMaterial({color:0x882211,roughness:0.7}));top.position.y=1.44;grp.add(top);
   grp.position.set(x,0,z);
   scene.add(grp);mapMeshes.push(grp);
-  OBST.push({x,z,hw:0.6,hd:0.6});
+  OBST.push({x,z,hw:0.6,hd:0.6,yMin:0,yMax:1.5});
   gimmicks.push({type:'barrel',mesh:grp,body,hp:1,x,z});
 }
 // ─── 컨셉형 기믹: 스테이지 1 훈련장 ───
@@ -2801,7 +2801,7 @@ function addShootingTarget(x,z,rot){
   const t4=new THREE.Mesh(new THREE.CylinderGeometry(0.1,0.1,0.066,12),new THREE.MeshStandardMaterial({color:0x111111,roughness:0.8,emissive:0x110000}));t4.rotation.x=Math.PI/2;t4.position.set(0,1.2,0.05);grp.add(t4);
   grp.position.set(x,0,z);grp.rotation.y=rot;
   scene.add(grp);mapMeshes.push(grp);
-  OBST.push({x,z,hw:0.6,hd:0.15});
+  OBST.push({x,z,hw:0.6,hd:0.15,yMin:0,yMax:1.8});
   gimmicks.push({type:'target',mesh:grp,target:t1,x,z,hp:3,hitT:0});
 }
 // ─── 스테이지 2 도시 ───
@@ -2813,7 +2813,7 @@ function addGasCanister(x,z){
   const pipe=new THREE.Mesh(new THREE.CylinderGeometry(0.05,0.05,0.3,5),new THREE.MeshStandardMaterial({color:0x444444,roughness:0.5,metalness:0.6}));pipe.position.y=1.4;grp.add(pipe);
   grp.position.set(x,0,z);
   scene.add(grp);mapMeshes.push(grp);
-  OBST.push({x,z,hw:0.45,hd:0.45});
+  OBST.push({x,z,hw:0.45,hd:0.45,yMin:0,yMax:1.35});
   gimmicks.push({type:'barrel',mesh:grp,body,hp:1,x,z});
 }
 function addElectricArc(x,z){
@@ -2830,7 +2830,7 @@ function addElectricArc(x,z){
   const warn=new THREE.Mesh(new THREE.BoxGeometry(0.3,0.3,0.02),new THREE.MeshBasicMaterial({color:0xffcc00}));warn.position.set(0,0.7,0.31);grp.add(warn);
   grp.position.set(x,0,z);
   scene.add(grp);mapMeshes.push(grp);
-  OBST.push({x,z,hw:0.55,hd:0.4});
+  OBST.push({x,z,hw:0.55,hd:0.4,yMin:0,yMax:1.85});
   gimmicks.push({type:'arc',mesh:grp,arc,x,z,radius:1.8,dmg:12,t:0});
 }
 // ─── 스테이지 3 산업 ───
@@ -2842,7 +2842,7 @@ function addPressureTank(x,z){
   const stack=new THREE.Mesh(new THREE.CylinderGeometry(0.15,0.15,0.6,6),new THREE.MeshStandardMaterial({color:0x333333,roughness:0.7,metalness:0.5}));stack.position.y=2.0;grp.add(stack);
   grp.position.set(x,0,z);
   scene.add(grp);mapMeshes.push(grp);
-  OBST.push({x,z,hw:0.95,hd:0.95});
+  OBST.push({x,z,hw:0.95,hd:0.95,yMin:0,yMax:2.3});
   gimmicks.push({type:'barrel',mesh:grp,body,hp:2,x,z,expDmg:75,expRadius:9});
 }
 function addSteamVent(x,z){
@@ -2868,7 +2868,7 @@ function addFuelDrum(x,z){
   const cap=new THREE.Mesh(new THREE.CylinderGeometry(0.12,0.12,0.08,8),new THREE.MeshStandardMaterial({color:0x222222,roughness:0.5,metalness:0.7}));cap.position.y=1.92;grp.add(cap);
   grp.position.set(x,0,z);
   scene.add(grp);mapMeshes.push(grp);
-  OBST.push({x,z,hw:0.85,hd:0.85});
+  OBST.push({x,z,hw:0.85,hd:0.85,yMin:0,yMax:2.0});
   gimmicks.push({type:'barrel',mesh:grp,body,hp:2,x,z,expDmg:80,expRadius:11});
 }
 // ─── 스테이지 5 정글 ───
@@ -2940,7 +2940,7 @@ function addReactorCore(x,z){
   if(_lightBudget>0){const pl=new THREE.PointLight(0x44ff66,5,18,2);pl.position.y=2;grp.add(pl);_lightBudget--;}
   grp.position.set(x,0,z);
   scene.add(grp);mapMeshes.push(grp);
-  OBST.push({x,z,hw:1.9,hd:1.9});
+  OBST.push({x,z,hw:1.9,hd:1.9,yMin:0,yMax:3.7});
   gimmicks.push({type:'pulse',mesh:grp,core,x,z,radius:7,dmg:30,period:3.5,t:0});
 }
 // ─── 스테이지 7 군사기지 ───
@@ -2955,7 +2955,7 @@ function addAmmoCrate(x,z){
   const top=new THREE.Mesh(new THREE.BoxGeometry(1.65,0.1,1.25),new THREE.MeshStandardMaterial({color:0x223018,roughness:0.85}));top.position.y=1.25;grp.add(top);
   grp.position.set(x,0,z);
   scene.add(grp);mapMeshes.push(grp);
-  OBST.push({x,z,hw:0.85,hd:0.65});
+  OBST.push({x,z,hw:0.85,hd:0.65,yMin:0,yMax:1.35});
   gimmicks.push({type:'barrel',mesh:grp,body:box,hp:2,x,z,expDmg:95,expRadius:12});
 }
 function addMortarTarget(x,z){
@@ -2981,7 +2981,7 @@ function addGasLeak(x,z){
   const cloud2=cloud.clone();cloud2.position.set(0.6,1.2,0.4);cloud2.scale.setScalar(0.7);grp.add(cloud2);
   grp.position.set(x,0,z);
   scene.add(grp);mapMeshes.push(grp);
-  OBST.push({x,z,hw:0.3,hd:0.3});
+  OBST.push({x,z,hw:0.3,hd:0.3,yMin:0,yMax:1.1});
   gimmicks.push({type:'dot_zone',mesh:grp,cloud,x,z,radius:2.5,dmg:10,color:0xaaaa44,t:0});
 }
 function addBurningRubble(x,z){
@@ -3021,7 +3021,7 @@ function addOilCauldron(x,z){
   const ring=new THREE.Mesh(new THREE.TorusGeometry(0.15,0.04,5,12),new THREE.MeshStandardMaterial({color:0x333333,roughness:0.5,metalness:0.7}));ring.rotation.x=Math.PI/2;ring.position.set(0.95,0.7,0);grp.add(ring);
   grp.position.set(x,0,z);
   scene.add(grp);mapMeshes.push(grp);
-  OBST.push({x,z,hw:1.0,hd:1.0});
+  OBST.push({x,z,hw:1.0,hd:1.0,yMin:0,yMax:1.0});
   gimmicks.push({type:'dot_zone',mesh:grp,oil,x,z,radius:1.8,dmg:22,color:0xff5500,t:0});
 }
 function addArrowTower(x,z){
@@ -3046,7 +3046,7 @@ function addArrowTower(x,z){
   head.position.y=3.3;grp.add(head);
   grp.position.set(x,0,z);
   scene.add(grp);mapMeshes.push(grp);
-  OBST.push({x,z,hw:1.0,hd:1.0});
+  OBST.push({x,z,hw:1.0,hd:1.0,yMin:0,yMax:3.6});
   gimmicks.push({type:'turret',mesh:grp,head,x,z,cd:0,range:35,dmg:8,muzzleY:3.55,muzzleColor:0xaaaaaa,arrow:true});
 }
 // ─── 스테이지 10 극지 ───
@@ -3058,7 +3058,7 @@ function addIceCrystal(x,z){
   const top=new THREE.Mesh(new THREE.OctahedronGeometry(0.3,0),new THREE.MeshStandardMaterial({color:0xddeeff,roughness:0.1,emissive:0x88aacc,emissiveIntensity:0.4,transparent:true,opacity:0.9,flatShading:true}));top.position.y=1.9;grp.add(top);
   grp.position.set(x,0,z);
   scene.add(grp);mapMeshes.push(grp);
-  OBST.push({x,z,hw:0.55,hd:0.55});
+  OBST.push({x,z,hw:0.55,hd:0.55,yMin:0,yMax:2.2});
   gimmicks.push({type:'barrel',mesh:grp,body:crystal,hp:1,x,z,expDmg:50,expRadius:8,expColor:0x88ddff});
 }
 function addIcePatch(x,z){
@@ -3154,7 +3154,7 @@ function addSoulPillar(x,z){
   if(_lightBudget>0){const pl=new THREE.PointLight(0xff2244,3,10,2);pl.position.y=3.9;grp.add(pl);_lightBudget--;}
   grp.position.set(x,0,z);
   scene.add(grp);mapMeshes.push(grp);
-  OBST.push({x,z,hw:0.65,hd:0.65});
+  OBST.push({x,z,hw:0.65,hd:0.65,yMin:0,yMax:4.4});
   gimmicks.push({type:'soul',mesh:grp,soul,stream,x,z,radius:4.5,dmg:8,t:0});
 }
 function addSpinningBlade(x,z,bladeR){
@@ -3170,7 +3170,7 @@ function addSpinningBlade(x,z,bladeR){
   spinner.position.y=1.0;grp.add(spinner);
   grp.position.set(x,0,z);
   scene.add(grp);mapMeshes.push(grp);
-  OBST.push({x,z,hw:0.2,hd:0.2});
+  OBST.push({x,z,hw:0.2,hd:0.2,yMin:0,yMax:1.5});
   gimmicks.push({type:'blade',mesh:grp,spinner,x,z,radius:bladeR*1.1,dmg:35});
 }
 function addTurret(x,z){
@@ -3185,7 +3185,7 @@ function addTurret(x,z){
   head.position.y=1.05;grp.add(head);
   grp.position.set(x,0,z);
   scene.add(grp);mapMeshes.push(grp);
-  OBST.push({x,z,hw:0.7,hd:0.7});
+  OBST.push({x,z,hw:0.7,hd:0.7,yMin:0,yMax:1.6});
   gimmicks.push({type:'turret',mesh:grp,head,x,z,cd:0,range:32,dmg:6});
 }
 
@@ -5001,7 +5001,10 @@ function fireLaser(){
   const origin=camera.position.clone();origin.y-=0.06;
   let maxDist=180;
   for(let t2=1;t2<maxDist;t2+=0.8){
-    if(isBlocked(origin.x+dir.x*t2,origin.z+dir.z*t2,0.05)){maxDist=t2;break;}
+    // 빔의 그 지점 높이까지 함께 넘겨야 낮은 엄폐물 위로 지나간다 (예전엔 높이를 무시해 모래주머니에도 막혔다)
+    const by=origin.y+dir.y*t2;
+    if(by<0){maxDist=t2;break;}                       // 지면에 꽂힘
+    if(isBlocked(origin.x+dir.x*t2,origin.z+dir.z*t2,0.05,by,by)){maxDist=t2;break;}
   }
   const hits=[];
   for(let j=0;j<enemies.length;j++){
