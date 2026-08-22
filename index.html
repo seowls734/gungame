@@ -4,6 +4,21 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1.0,maximum-scale=1.0,user-scalable=no">
 <title>TACTICAL SURVIVAL</title>
+<meta name="description" content="16개 스테이지, 12종 무기의 웹 FPS 서바이벌. 브라우저에서 바로 플레이.">
+<link rel="icon" type="image/png" sizes="64x64" href="favicon.png">
+<link rel="apple-touch-icon" href="icon.png">
+<meta name="theme-color" content="#040806">
+<!-- 링크 공유 시 미리보기(썸네일) -->
+<meta property="og:type" content="website">
+<meta property="og:title" content="TACTICAL SURVIVAL">
+<meta property="og:description" content="16개 스테이지, 12종 무기의 웹 FPS 서바이벌. 브라우저에서 바로 플레이.">
+<meta property="og:image" content="thumbnail.png">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="TACTICAL SURVIVAL">
+<meta name="twitter:description" content="16개 스테이지, 12종 무기의 웹 FPS 서바이벌.">
+<meta name="twitter:image" content="thumbnail.png">
 <style>
 *{margin:0;padding:0;box-sizing:border-box}
 body{overflow:hidden;background:#000;font-family:'Courier New',monospace}
@@ -3820,7 +3835,7 @@ function buildMap(sid){
     addFence(-150,-100,-100,-150);addFence(100,-150,150,-100);
     // 🎯 사격 표적 — 훈련 컨셉: 동심원 표적 + 약한 연습용 폭발 통
     addShootingTarget(-20,-25,0);addShootingTarget(20,-25,0);addShootingTarget(-40,30,Math.PI/4);addShootingTarget(40,30,-Math.PI/4);
-    addExplosiveBarrel(0,-50);addExplosiveBarrel(-30,50);addExplosiveBarrel(30,50);
+    addExplosiveBarrel(0,-44);addExplosiveBarrel(-30,50);addExplosiveBarrel(30,50);
   } else if(sid===2){
     buildDistantSilhouette('urban');
     for(let i=-2;i<=2;i++){addLamp(i*40,-15,0xffcc66);addLamp(i*40,15,0xffcc66);}
@@ -3834,9 +3849,9 @@ function buildMap(sid){
     addBillboard(100,-50,-Math.PI/4,0x331144,0xcc44ff);
     addFence(-145,-80,-80,-145);addFence(80,145,145,80);
     // 🛢️ 도시 골목 컨셉: 가스 캐니스터 (노란 LPG통) + 전기 변압기 (스파크)
-    addGasCanister(-20,-30);addGasCanister(20,-30);addGasCanister(-50,-50);addGasCanister(50,50);
-    addGasCanister(-50,50);addGasCanister(50,-50);
-    addElectricArc(-25,30);addElectricArc(25,30);addElectricArc(0,-80);
+    addGasCanister(-20,-30);addGasCanister(20,-30);addGasCanister(-50,-55);addGasCanister(50,55);
+    addGasCanister(-50,55);addGasCanister(50,-55);
+    addElectricArc(-20,30);addElectricArc(20,30);addElectricArc(0,-68);
   } else if(sid===3){
     buildDistantSilhouette('industrial');
     for(let i=-4;i<=4;i++){addLamp(i*25,0,0xff8800);addLamp(0,i*25,0xff8800);}
@@ -3880,7 +3895,7 @@ function buildMap(sid){
     tryPlace((x,z)=>addBroadleaf(x,z,4+Math.random()*2,0x3a2818,0x1a3010),12,20,150);
     tryPlace((x,z)=>addDeadTree(x,z,4+Math.random()*2),6,30,130);
     tryPlace((x,z)=>addRock(x,z,1+Math.random(),0x3a4030),10,25,140);
-    addCampfire(0,-40);addCampfire(-60,-60);addCampfire(60,60);
+    addCampfire(0,-40);addCampfire(-64,-64);addCampfire(64,64);
     // 🌿 정글 컨셉: 식인 독 식물 (DoT 가스 구름), 함정 구덩이 (낙하 데미지)
     addPoisonPlant(-20,0);addPoisonPlant(20,0);addPoisonPlant(0,-30);addPoisonPlant(0,30);
     addPoisonPlant(-50,-30);addPoisonPlant(50,30);addPoisonPlant(-80,40);addPoisonPlant(80,-40);
@@ -3902,7 +3917,7 @@ function buildMap(sid){
     addReactorCore(0,-90);
     addRadiationPuddle(-25,-15);addRadiationPuddle(25,-15);addRadiationPuddle(-25,15);addRadiationPuddle(25,15);
     addRadiationPuddle(-60,-50);addRadiationPuddle(60,-50);addRadiationPuddle(-60,50);addRadiationPuddle(60,50);
-    addRadiationPuddle(0,80);
+    addRadiationPuddle(0,95);
   } else if(sid===7){
     buildDistantSilhouette('military');
     for(let i=-4;i<=4;i++){addLamp(i*25,-30,0xeeddaa);addLamp(i*25,30,0xeeddaa);}
@@ -3918,9 +3933,9 @@ function buildMap(sid){
     addBillboard(0,-150,0,0x223a18,0x88aa44);
     // 🪖 군사기지 컨셉: 탄약고 (대형 폭발), 자동 기관총탑, 박격포 표적 (주기적 폭격)
     addAmmoCrate(-22,-22);addAmmoCrate(22,-22);addAmmoCrate(-22,22);addAmmoCrate(22,22);
-    addAmmoCrate(0,-80);addAmmoCrate(0,80);
+    addAmmoCrate(0,-80);addAmmoCrate(5,80);
     addTurret(-50,-50);addTurret(50,-50);addTurret(0,80);
-    addMortarTarget(-80,-40);addMortarTarget(80,40);addMortarTarget(-80,40);
+    addMortarTarget(-74,-46);addMortarTarget(80,40);addMortarTarget(-80,40);
   } else if(sid===8){
     buildDistantSilhouette('ruined');
     for(let i=0;i<12;i++){const a=Math.random()*Math.PI*2,r=20+Math.random()*100;addLamp(Math.cos(a)*r,Math.sin(a)*r,0xff4400);}
@@ -3930,7 +3945,7 @@ function buildMap(sid){
     addBillboard(0,-100,0,0x442211,0xff4400);
     addBillboard(-90,40,Math.PI/4,0x331111,0xff2200);
     tryPlace((x,z)=>addBarrel(x,z,0x6a3a20),8,30,120);
-    addCampfire(40,-40);addCampfire(-40,40);addCampfire(-80,-80);
+    addCampfire(46,-46);addCampfire(-46,46);addCampfire(-80,-80);
     // 🏚️ 폐허도시 컨셉: 가스 누출 (보이지 않는 폭발성 가스), 불타는 잔해 (지속 화염 지대)
     addGasLeak(-20,-20);addGasLeak(20,-20);addGasLeak(-20,20);addGasLeak(20,20);
     addGasLeak(0,-65);addGasLeak(0,65);addGasLeak(-90,0);addGasLeak(90,0);
@@ -3958,11 +3973,11 @@ function buildMap(sid){
     tryPlace((x,z)=>addWreck(x,z),5,40,130);
     tryPlace((x,z)=>addCrate(x,z),5,30,90);
     addAntenna(-130,-130,22);addAntenna(130,130,22);
-    addCampfire(0,-50);addCampfire(60,60);addCampfire(-60,60);
+    addCampfire(0,-44);addCampfire(60,60);addCampfire(-60,60);
     // ❄️ 극지 컨셉: 얼음 크리스탈 (충격 시 동결 폭발), 빙판 (미끄러짐)
     addIceCrystal(-25,-25);addIceCrystal(25,-25);addIceCrystal(-25,25);addIceCrystal(25,25);
-    addIceCrystal(-55,0);addIceCrystal(55,0);addIceCrystal(0,-60);addIceCrystal(0,60);
-    addIcePatch(-40,40);addIcePatch(40,-40);addIcePatch(0,0);
+    addIceCrystal(-48,0);addIceCrystal(48,0);addIceCrystal(0,-60);addIceCrystal(0,60);
+    addIcePatch(-50,32);addIcePatch(50,-32);addIcePatch(0,0);
   } else if(sid===11){
     buildDistantSilhouette('bunker');
     // 천장 형광등 — emissive 패널만 (조명 없음), 광원은 예산 안에서 듬성듬성만
@@ -3982,9 +3997,9 @@ function buildMap(sid){
     addSandbagWall(-40,-40,0,6);addSandbagWall(40,40,0,6);addSandbagWall(-40,40,Math.PI/2,6);addSandbagWall(40,-40,Math.PI/2,6);
     tryPlace((x,z)=>addRubble(x,z,2.5),6,25,130);
     // 🕳️ 지하 벙커 컨셉: 회전 서치라이트 (감시 빔), 가스 분사구 (천장 환기구), 회전 톱날 (방어 장치)
-    addSearchlight(-30,-30);addSearchlight(30,30);addSearchlight(-30,30);addSearchlight(30,-30);
+    addSearchlight(-36,-30);addSearchlight(36,30);addSearchlight(-36,30);addSearchlight(36,-30);
     addGasVent(0,-55);addGasVent(0,55);addGasVent(-55,0);addGasVent(55,0);
-    addSpinningBlade(-90,0);addSpinningBlade(90,0);
+    addSpinningBlade(-84,0);addSpinningBlade(84,0);
   } else if(sid===12){
     buildDistantSilhouette('hell');
     for(let i=0;i<12;i++){const a=i/12*Math.PI*2,r=50;addLamp(Math.cos(a)*r,Math.sin(a)*r,0xff2200);}
@@ -4014,7 +4029,7 @@ function buildMap(sid){
     }
     // 💀 지옥 컨셉: 용암 웅덩이 (광역 DoT), 가시 함정 (주기적 솟구침), 영혼 흡수 결정 (HP 흡수)
     addLavaPool(-30,-30,2.5);addLavaPool(30,30,2.5);addLavaPool(-30,30,2.0);addLavaPool(30,-30,2.0);
-    addLavaPool(0,-80,3.0);addLavaPool(0,80,3.0);
+    addLavaPool(0,-68,3.0);addLavaPool(0,68,3.0);
     addSpikeTrap(-50,0);addSpikeTrap(50,0);addSpikeTrap(0,-50);addSpikeTrap(0,50);
     addSpikeTrap(-90,-90);addSpikeTrap(90,90);addSpikeTrap(-90,90);addSpikeTrap(90,-90);
     addSoulPillar(-120,-120);addSoulPillar(120,120);addSoulPillar(-120,120);addSoulPillar(120,-120);
@@ -4029,11 +4044,11 @@ function buildMap(sid){
     addBillboard(0,-130,0,0x4a3018,0xddaa55);
     // 사막 매장 폭탄
     addExplosiveBarrel(-25,-25);addExplosiveBarrel(25,-25);addExplosiveBarrel(-25,25);addExplosiveBarrel(25,25);
-    addExplosiveBarrel(0,40);addExplosiveBarrel(0,-90);
+    addExplosiveBarrel(5,40);addExplosiveBarrel(0,-90);
     // 가시 함정 (모래 함정 — 축소)
     addSpikeTrap(-60,60);addSpikeTrap(60,-60);
     // 도굴꾼의 회전 톱날 (축소)
-    addSpinningBlade(-90,0);
+    addSpinningBlade(-84,0);
     // 모래주머니
     addSandbagWall(-60,60,0,7);addSandbagWall(60,-60,Math.PI/2,7);
     // 가스 분출 (모래 폭풍 효과)
@@ -4079,9 +4094,9 @@ function buildMap(sid){
     // 용암 웅덩이 (외곽 위주 — 적 진입로 회피용)
     addLavaPool(-100,-100,3.5);addLavaPool(100,100,3.5);addLavaPool(-100,100,3);addLavaPool(100,-100,3);
     // 가시 함정 (축소)
-    addSpikeTrap(-40,0);addSpikeTrap(40,0);addSpikeTrap(0,-90);
+    addSpikeTrap(-40,7);addSpikeTrap(40,7);addSpikeTrap(0,-90);
     // 영혼 결정 — 화산 정령
-    addSoulPillar(-130,0);addSoulPillar(130,0);
+    addSoulPillar(-122,0);addSoulPillar(122,0);
     // 폭발성 돌
     tryPlace((x,z)=>addRock(x,z,1.5+Math.random()*0.8,0x110404),14,30,120);
     tryPlace((x,z)=>addDeadTree(x,z,3+Math.random()*2),8,40,130);
