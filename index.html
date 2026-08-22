@@ -232,9 +232,65 @@ body{overflow:hidden;background:#000;font-family:'Courier New',monospace}
 #btn-skill-c{bottom:200px;right:190px;}
 #btn-skill-e{bottom:260px;right:130px;}
 #btn-skill-q{bottom:200px;right:70px;}
+/* -- account (login/signup) -- */
+#auth-bg{display:none;position:fixed;inset:0;z-index:200;background:radial-gradient(ellipse at center,#06120c 0%,#000 70%);
+  align-items:center;justify-content:center;font-family:'Courier New',monospace;padding:16px}
+#auth-bg.active{display:flex}
+#auth-card{width:min(380px,100%);background:rgba(8,16,24,0.98);border:1px solid rgba(0,255,80,0.28);
+  padding:30px 26px 24px;box-shadow:0 0 40px rgba(0,255,80,0.08)}
+#auth-logo{font-size:38px;text-align:center;margin-bottom:8px}
+#auth-title{font-size:22px;letter-spacing:5px;color:#00ff88;text-align:center;margin-bottom:6px}
+#auth-sub{font-size:11px;color:#666;text-align:center;line-height:1.7;margin-bottom:20px}
+#auth-tabs{display:flex;gap:6px;margin-bottom:18px}
+#auth-tabs .atab{flex:1;text-align:center;padding:8px 0;font-size:12px;letter-spacing:2px;color:#666;
+  border:1px solid rgba(255,255,255,0.08);background:rgba(0,0,0,0.4);cursor:pointer;transition:all .15s}
+#auth-tabs .atab.active{color:#00ff88;border-color:rgba(0,255,140,0.6);background:rgba(0,50,25,0.5)}
+.auth-field{margin-bottom:12px}
+.auth-field label{display:block;font-size:10px;letter-spacing:2px;color:#555;margin-bottom:5px}
+.auth-field input{width:100%;padding:10px 11px;background:rgba(0,0,0,0.6);border:1px solid rgba(255,255,255,0.12);
+  color:#e0e0e0;font-family:'Courier New',monospace;font-size:13px;outline:none}
+.auth-field input:focus{border-color:rgba(0,255,140,0.6)}
+#auth-msg{min-height:17px;font-size:11px;line-height:1.5;color:#888;margin-bottom:10px}
+#auth-msg.bad{color:#ff6666}
+#auth-go{width:100%;padding:12px;background:rgba(0,60,30,0.6);border:1px solid rgba(0,255,140,0.5);
+  color:#00ff88;font-family:'Courier New',monospace;font-size:13px;letter-spacing:3px;cursor:pointer;transition:all .15s}
+#auth-go:hover{background:rgba(0,90,45,0.8);box-shadow:0 0 20px rgba(0,255,80,0.2)}
+#auth-guest{width:100%;margin-top:8px;padding:9px;background:transparent;border:1px solid rgba(255,255,255,0.1);
+  color:#555;font-family:'Courier New',monospace;font-size:11px;letter-spacing:1px;cursor:pointer}
+#auth-guest:hover{color:#999;border-color:rgba(255,255,255,0.25)}
+#auth-users{margin-top:16px;border-top:1px solid rgba(255,255,255,0.08);padding-top:11px}
+#auth-users .ttl{font-size:10px;letter-spacing:2px;color:#444;margin-bottom:7px}
+#auth-users .u{display:inline-block;font-size:11px;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.12);
+  padding:4px 9px;margin:0 4px 4px 0;cursor:pointer;color:#bbb}
+#auth-users .u:hover{border-color:rgba(0,255,140,0.6);color:#00ff88}
+#whoami{position:absolute;top:16px;right:18px;z-index:210;font-family:'Courier New',monospace;font-size:11px;
+  letter-spacing:1px;color:#55aa77;display:none}
+#whoami.show{display:block}
+#logout-btn{margin-top:10px;padding:8px 22px;background:rgba(0,0,0,0.4);border:1px solid rgba(255,255,255,0.15);
+  color:#777;font-family:'Courier New',monospace;font-size:11px;letter-spacing:2px;cursor:pointer;transition:all .15s}
+#logout-btn:hover{border-color:rgba(0,255,140,0.5);color:#00ff88}
 </style>
 </head>
 <body>
+<div id="auth-bg">
+  <div id="auth-card">
+    <div id="auth-logo">&#127919;</div>
+    <div id="auth-title">TACTICAL</div>
+    <div id="auth-sub">&#44228;&#51221;&#47560;&#45796; &#51652;&#54665; &#49345;&#54889;&#51060; &#46384;&#47196; &#51200;&#51109;&#46121;&#45768;&#45796;.<br>&#51060; &#48652;&#46972;&#50864;&#51200;(&#44592;&#44592;)&#50640;&#47564; &#51200;&#51109;&#46251;&#50836;.</div>
+    <div id="auth-tabs">
+      <div class="atab active" data-mode="login">&#47196;&#44536;&#51064;</div>
+      <div class="atab" data-mode="signup">&#54924;&#50896;&#44032;&#51077;</div>
+    </div>
+    <div class="auth-field"><label>&#50500;&#51060;&#46356;</label><input id="auth-id" maxlength="16" autocomplete="username" placeholder="2~16&#51088;"></div>
+    <div class="auth-field"><label>&#48708;&#48128;&#48264;&#54840;</label><input id="auth-pw" type="password" maxlength="32" autocomplete="current-password" placeholder="4&#51088; &#51060;&#49345;"></div>
+    <div class="auth-field" id="auth-pw2-wrap" style="display:none"><label>&#48708;&#48128;&#48264;&#54840; &#54869;&#51064;</label><input id="auth-pw2" type="password" maxlength="32" autocomplete="new-password"></div>
+    <div id="auth-msg"></div>
+    <button id="auth-go">&#51089;&#51204; &#44060;&#49884;</button>
+    <button id="auth-guest">&#44172;&#49828;&#53944;&#47196; &#54540;&#47112;&#51060; (&#51200;&#51109;&#51008; &#51060; &#44592;&#44592;&#50640;&#47564;)</button>
+    <div id="auth-users" style="display:none"><div class="ttl">&#51200;&#51109;&#46108; &#44228;&#51221;</div><div id="auth-user-list"></div></div>
+  </div>
+</div>
+<div id="whoami"></div>
 <div id="ui">
   <div class="label">SURVIVOR HP</div>
   <div class="bar-wrap"><div id="hp-bar"></div></div>
@@ -4479,6 +4535,13 @@ function showStageLobby(afterClear){
     });
     lobbyEl.appendChild(resetBtn);
   }
+  let outBtn=document.getElementById('logout-btn');
+  if(!outBtn){
+    outBtn=document.createElement('button');outBtn.id='logout-btn';
+    outBtn.addEventListener('click',e=>{e.stopPropagation();logoutUser();});
+    lobbyEl.appendChild(outBtn);
+  }
+  outBtn.innerText=curUser?('LOGOUT ('+curUser+')'):'로그인 / 회원가입';
   lobbyEl.classList.add('active');
 }
 
@@ -4663,7 +4726,10 @@ const STAGES=[
 ];
 let currentStageId=1,stageWaveNum=1;
 let pickedUpgrades=[]; // 현재 스테이지에서 선택한 업그레이드 ID 목록 (이어하기 시 재적용)
-const SAVE_KEY='tac_surv_save';
+const LEGACY_SAVE_KEY='tac_surv_save';   // 계정 기능 이전의 세이브(= 게스트 슬롯)
+let SAVE_KEY=LEGACY_SAVE_KEY;            // 로그인한 계정에 따라 바뀌다
+const ACCOUNTS_KEY='tac_surv_accounts';
+const SESSION_KEY='tac_surv_session';
 function loadSave(){
   try{const d=JSON.parse(localStorage.getItem(SAVE_KEY));if(d)return{cleared:d.cleared?new Set(d.cleared):new Set(),lastStage:d.lastStage||0,lastWave:d.lastWave||0,pickedUpgrades:Array.isArray(d.pickedUpgrades)?d.pickedUpgrades:[]};}catch(e){}
   return{cleared:new Set(),lastStage:0,lastWave:0,pickedUpgrades:[]};
@@ -4769,6 +4835,40 @@ document.addEventListener('wheel',e=>{
   switchWep(WKEYS[idx]);
 },{passive:false});
 
+// ── 시점 감도 (모바일 터치 · 데스크톱 마우스 공용) ──
+// 예전에는 아래 isMobile 블록 안에서만 버튼을 연결해, PC에서는 SENS 버튼이 보여도 눌리지 않았다.
+let lookSens=0.004;
+{
+  const sensSlider=document.getElementById('sens-slider');
+  const sensVal=document.getElementById('sens-val');
+  const sensBtn=document.getElementById('sens-btn');
+  const sensPanel=document.getElementById('sens-panel');
+  const sensClose=document.getElementById('sens-close');
+  const applySens=v=>{
+    v=Number(v)||8;
+    sensVal.innerText=v;
+    lookSens=v*0.0005;      // 모바일 터치 룩
+    ctrl.pointerSpeed=v/8;  // 데스크톱 마우스 (슬라이더 8 = 기본 속도)
+  };
+  const savedSens=localStorage.getItem('ts_sensitivity');
+  if(savedSens) sensSlider.value=savedSens;
+  applySens(sensSlider.value);
+  sensSlider.addEventListener('input',()=>{
+    applySens(sensSlider.value);
+    localStorage.setItem('ts_sensitivity',sensSlider.value);
+  });
+  // 버튼·패널 조작이 캔버스(사격/포인터락)로 새지 않도록 막는다
+  ['click','mousedown','pointerdown','touchstart'].forEach(ev=>{
+    sensBtn.addEventListener(ev,e=>e.stopPropagation());
+    sensPanel.addEventListener(ev,e=>e.stopPropagation());
+  });
+  sensBtn.addEventListener('click',()=>{
+    if(ctrl.isLocked) ctrl.unlock();   // 포인터가 잠긴 상태면 먼저 풀어야 슬라이더를 만질 수 있다
+    sensPanel.classList.toggle('active');
+  });
+  sensClose.addEventListener('click',()=>sensPanel.classList.remove('active'));
+}
+
 if(isMobile){
   const joyZone=document.getElementById('joystick-zone');
   const joyBase=document.getElementById('joystick-base');
@@ -4781,17 +4881,6 @@ if(isMobile){
   const btnNext=document.getElementById('btn-next-wep');
   let joyTouchId=null,joyCX=0,joyCY=0;
   const lookTouches={};
-  let lookSens=0.004;
-  const sensSlider=document.getElementById('sens-slider');
-  const sensVal=document.getElementById('sens-val');
-  const sensBtn=document.getElementById('sens-btn');
-  const sensPanel=document.getElementById('sens-panel');
-  const sensClose=document.getElementById('sens-close');
-  const savedSens=localStorage.getItem('ts_sensitivity');
-  if(savedSens){sensSlider.value=savedSens;sensVal.innerText=savedSens;lookSens=Number(savedSens)*0.0005;}
-  sensSlider.addEventListener('input',()=>{const v=sensSlider.value;sensVal.innerText=v;lookSens=Number(v)*0.0005;localStorage.setItem('ts_sensitivity',v);});
-  sensBtn.addEventListener('click',()=>sensPanel.classList.toggle('active'));
-  sensClose.addEventListener('click',()=>sensPanel.classList.remove('active'));
   const JOY_MAX=50;
   function applyLook(dx,dy){
     if(!mobileActive||gameOver||gamePaused)return;
@@ -6539,7 +6628,118 @@ hpBar.style.width='100%';
 rebuildGun('pistol');
 updateWBar();
 instrEl.style.display='none';
-showStageLobby(false);
+
+// ── 계정(로컬) ──
+// 서버가 없는 단일 HTML 게임이라 계정 정보는 이 브라우저의 localStorage에만 저장된다.
+// 비밀번호는 솜트를 섞은 해시로만 보관하지만, 로컬 저장 특성상 강한 보안 수단은 아니다.
+let curUser=null;                                   // null이면 게스트
+let authMode='login';
+const $a=id=>document.getElementById(id);
+function loadAccounts(){
+  try{const d=JSON.parse(localStorage.getItem(ACCOUNTS_KEY)||'{}');return (d&&d.users)?d:{users:{},legacyClaimed:false};}
+  catch(e){return {users:{},legacyClaimed:false};}
+}
+function saveAccounts(a){try{localStorage.setItem(ACCOUNTS_KEY,JSON.stringify(a));}catch(e){}}
+function hashPw(pw,salt){
+  // FNV-1a 기반 반복 해시 (외부 라이브러리 없이 동작)
+  let str=salt+'|'+pw,out='';
+  for(let round=0;round<4;round++){
+    let h=0x811c9dc5;
+    for(let i=0;i<str.length;i++){h^=str.charCodeAt(i);h=Math.imul(h,0x01000193)>>>0;}
+    out+=h.toString(36);str=out+'|'+salt+'|'+pw;
+  }
+  return out;
+}
+function newSalt(){return Math.floor(Math.random()*1e9).toString(36)+Date.now().toString(36);}
+function saveKeyFor(user){return user?LEGACY_SAVE_KEY+'::'+user:LEGACY_SAVE_KEY;}
+function authMsg(t,cls){const m=$a('auth-msg');m.textContent=t||'';m.className=cls||'';}
+function renderAuth(){
+  const acc=loadAccounts(),names=Object.keys(acc.users);
+  document.querySelectorAll('#auth-tabs .atab').forEach(t=>t.classList.toggle('active',t.dataset.mode===authMode));
+  $a('auth-pw2-wrap').style.display=authMode==='signup'?'':'none';
+  $a('auth-go').textContent=authMode==='signup'?'가입하고 시작':'작전 개시';
+  $a('auth-pw').setAttribute('autocomplete',authMode==='signup'?'new-password':'current-password');
+  const hasLegacy=!!localStorage.getItem(LEGACY_SAVE_KEY);
+  $a('auth-sub').innerHTML=(authMode==='signup'&&hasLegacy&&!acc.legacyClaimed)
+    ? '지금까지의 진행 상황을 이 계정으로 그대로 가져옵니다.'
+    : '계정마다 진행 상황이 따로 저장됩니다.<br>이 브라우저(기기)에만 저장돼요.';
+  const box=$a('auth-users'),list=$a('auth-user-list');
+  if(names.length&&authMode==='login'){
+    box.style.display='';list.innerHTML='';
+    names.forEach(n=>{const b=document.createElement('span');b.className='u';b.textContent='👤 '+n;
+      b.addEventListener('click',()=>{$a('auth-id').value=n;$a('auth-pw').focus();});list.appendChild(b);});
+  }else box.style.display='none';
+  authMsg('');
+}
+function showAuth(){
+  lobbyEl.classList.remove('active');
+  stageEl.classList.remove('active');
+  $a('whoami').classList.remove('show');
+  $a('auth-bg').classList.add('active');
+  $a('auth-pw').value='';$a('auth-pw2').value='';
+  renderAuth();
+  setTimeout(()=>{if(!$a('auth-id').value)$a('auth-id').focus();else $a('auth-pw').focus();},50);
+}
+function submitAuth(){
+  const id=$a('auth-id').value.trim(),pw=$a('auth-pw').value;
+  if(id.length<2||id.length>16)return authMsg('아이디는 2~16자로 입력해 주세요.','bad');
+  if(/\s/.test(id))return authMsg('아이디에 공백은 쓸 수 없어요.','bad');
+  if(pw.length<4)return authMsg('비밀번호는 4자 이상이어야 해요.','bad');
+  const acc=loadAccounts(),u=acc.users[id];
+  if(authMode==='signup'){
+    if(u)return authMsg('이미 있는 아이디예요. 로그인 탭을 이용해 주세요.','bad');
+    if($a('auth-pw2').value!==pw)return authMsg('비밀번호 확인이 일치하지 않아요.','bad');
+    const salt=newSalt();
+    acc.users[id]={s:salt,h:hashPw(pw,salt),at:Date.now()};
+    // 계정 기능 이전의 세이브가 있다면 첫 계정이 이어받는다
+    const legacy=localStorage.getItem(LEGACY_SAVE_KEY);
+    if(legacy&&!acc.legacyClaimed){
+      try{localStorage.setItem(saveKeyFor(id),legacy);acc.legacyClaimed=true;}catch(e){}
+    }
+    saveAccounts(acc);
+    enterGame(id);
+  }else{
+    if(!u)return authMsg('없는 아이디예요. 회원가입 탭에서 만들어 주세요.','bad');
+    if(hashPw(pw,u.s)!==u.h)return authMsg('비밀번호가 맞지 않아요.','bad');
+    enterGame(id);
+  }
+}
+function enterGame(user){
+  curUser=user||null;
+  SAVE_KEY=saveKeyFor(curUser);
+  try{curUser?localStorage.setItem(SESSION_KEY,curUser):localStorage.removeItem(SESSION_KEY);}catch(e){}
+  // 계정 세이브를 현재 진행 상태로 갈아끼운다
+  const d=loadSave();
+  clearedStages.clear();d.cleared.forEach(x=>clearedStages.add(x));
+  currentStageId=d.lastStage||1;stageWaveNum=d.lastWave||1;
+  pickedUpgrades=Array.isArray(d.pickedUpgrades)?d.pickedUpgrades.slice():[];
+  $a('auth-bg').classList.remove('active');
+  const w=$a('whoami');w.textContent=curUser?('👤 '+curUser):'👤 GUEST';w.classList.add('show');
+  showStageLobby(false);
+}
+function logoutUser(){
+  try{ctrl.unlock();}catch(e){}
+  gameOver=false;
+  try{localStorage.removeItem(SESSION_KEY);}catch(e){}
+  $a('auth-id').value=curUser||'';
+  curUser=null;authMode='login';
+  showAuth();
+}
+document.querySelectorAll('#auth-tabs .atab').forEach(t=>t.addEventListener('click',()=>{authMode=t.dataset.mode;renderAuth();}));
+$a('auth-go').addEventListener('click',submitAuth);
+$a('auth-guest').addEventListener('click',()=>enterGame(null));
+['auth-id','auth-pw','auth-pw2'].forEach(id=>$a(id).addEventListener('keydown',e=>{
+  if(e.key==='Enter'){e.preventDefault();submitAuth();}
+}));
+
+// 부팅: 마지막 로그인 계정이 있으면 바로 이어서, 없으면 로그인 화면
+(function bootAuth(){
+  let last=null;
+  try{last=localStorage.getItem(SESSION_KEY);}catch(e){}
+  const acc=loadAccounts();
+  if(last&&acc.users[last]) enterGame(last);
+  else showAuth();
+})();
 animate();
 </script>
 </body>
