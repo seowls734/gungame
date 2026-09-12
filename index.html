@@ -2389,17 +2389,19 @@ const xhEl=document.getElementById('crosshair');
 
 const WD={
   pistol:  {n:'PISTOL',         k:'1',mag:18, rld:1.0,spd:55, dmg:1.06, spr:0.003, pel:1, cd:0.18,aFov:58,hFov:75,rcG:0.06, rcRX:0.08,bs:[0.04,0.04,0.15], bc:0xd4b06a,mdl:'pistol', auto:false},
-  smg:     {n:'SMG [AUTO]',     k:'2',mag:35, rld:1.3,spd:50, dmg:0.66,spr:0.011, pel:1, cd:0.07,aFov:62,hFov:75,rcG:0.03, rcRX:0.04,bs:[0.03,0.03,0.12], bc:0xffaa44,mdl:'smg',    auto:true},
-  ar:      {n:'RIFLE [AUTO]',   k:'3',mag:30, rld:1.6,spd:60, dmg:1.23, spr:0.005, pel:1, cd:0.09,aFov:56,hFov:75,rcG:0.05, rcRX:0.07,bs:[0.038,0.038,0.18],bc:0xcccccc,mdl:'ar',    auto:true},
-  shotgun: {n:'SHOTGUN',        k:'4',mag:8,  rld:1.6,spd:38, dmg:0.88, spr:0.042, pel:8, cd:0.65,aFov:63,hFov:75,rcG:0.13, rcRX:0.18,bs:[0.04,0.04,0.14], bc:0xffcc66,mdl:'shotgun',auto:false},
+  ar:      {n:'RIFLE [AUTO]',   k:'2',mag:30, rld:1.6,spd:60, dmg:1.23, spr:0.005, pel:1, cd:0.09,aFov:56,hFov:75,rcG:0.05, rcRX:0.07,bs:[0.038,0.038,0.18],bc:0xcccccc,mdl:'ar',    auto:true},
+  shotgun: {n:'SHOTGUN',        k:'3',mag:8,  rld:1.6,spd:38, dmg:0.88, spr:0.042, pel:8, cd:0.65,aFov:63,hFov:75,rcG:0.13, rcRX:0.18,bs:[0.04,0.04,0.14], bc:0xffcc66,mdl:'shotgun',auto:false},
+  autoshot:{n:'AUTO SHOTGUN [AUTO]',k:'4',mag:24,rld:2.4,spd:40,dmg:0.42,spr:0.030,pel:6,cd:0.28,aFov:62,hFov:75,rcG:0.08,rcRX:0.11,bs:[0.036,0.036,0.13],bc:0xff9944,mdl:'autoshot',auto:true},
   sniper:  {n:'SNIPER RIFLE',   k:'5',mag:5,  rld:2.2,spd:120,dmg:4.4, spr:0.0002,pel:1, cd:1.0, aFov:18,hFov:75,rcG:0.18, rcRX:0.25,bs:[0.028,0.028,0.26],bc:0xcfcfcf,mdl:'sniper',auto:false,scope:true},
-  revolver:{n:'REVOLVER',       k:'6',mag:6,  rld:1.8,spd:68, dmg:2.46, spr:0.002, pel:1, cd:0.40,aFov:56,hFov:75,rcG:0.10, rcRX:0.14,bs:[0.048,0.048,0.18],bc:0xbb8833,mdl:'revolver',auto:false},
+  dmr:     {n:'DMR',            k:'6',mag:12, rld:1.6,spd:90, dmg:2.82, spr:0.001, pel:1, cd:0.32,aFov:38,hFov:75,rcG:0.09, rcRX:0.13,bs:[0.032,0.032,0.22],bc:0x88aaff,mdl:'dmr',auto:false},
   lmg:     {n:'LMG [AUTO]',     k:'7',mag:80, rld:3.5,spd:52, dmg:1.41, spr:0.018, pel:1, cd:0.085,aFov:58,hFov:75,rcG:0.05,rcRX:0.06,bs:[0.042,0.042,0.18], bc:0xff8844,mdl:'lmg',    auto:true},
-  dmr:     {n:'DMR',            k:'8',mag:12, rld:1.6,spd:90, dmg:2.82, spr:0.001, pel:1, cd:0.32,aFov:38,hFov:75,rcG:0.09, rcRX:0.13,bs:[0.032,0.032,0.22],bc:0x88aaff,mdl:'dmr',auto:false},
+  minigun: {n:'MINIGUN [AUTO]', k:'8',mag:200,rld:4.5,spd:60, dmg:0.62, spr:0.020, pel:1, cd:0.038,aFov:65,hFov:75,rcG:0.02,rcRX:0.025,bs:[0.034,0.034,0.13],bc:0xff4444,mdl:'minigun',auto:true},
   laser:   {n:'LASER [AUTO]',   k:'9',mag:25, rld:1.8,spd:0,  dmg:2.2, spr:0.000, pel:1, cd:0.12,aFov:52,hFov:75,rcG:0.02, rcRX:0.025,bs:[0.025,0.025,0.35],bc:0x00ffff,mdl:'laser',auto:true,isLaser:true},
-  plasma:  {n:'PLASMA GUN',    k:'0',mag:6,  rld:2.0,spd:45, dmg:3.96, spr:0.008, pel:1, cd:0.80,aFov:60,hFov:75,rcG:0.16, rcRX:0.22,bs:[0.055,0.055,0.16],bc:0xff44ff,mdl:'plasma',auto:false,isSplash:true},
-  minigun: {n:'MINIGUN [AUTO]', k:'Q',mag:200,rld:4.5,spd:60, dmg:0.62, spr:0.020, pel:1, cd:0.038,aFov:65,hFov:75,rcG:0.02,rcRX:0.025,bs:[0.034,0.034,0.13],bc:0xff4444,mdl:'minigun',auto:true},
-  crossbow:{n:'CROSSBOW',       k:'E',mag:1,  rld:2.2,spd:100,dmg:5.28, spr:0.000, pel:1, cd:2.2, aFov:48,hFov:75,rcG:0.11, rcRX:0.15,bs:[0.04,0.018,0.32], bc:0x44ff88,mdl:'crossbow',auto:false},
+  plasma:  {n:'PLASMA GUN',     k:'0',mag:6,  rld:2.0,spd:45, dmg:3.96, spr:0.008, pel:1, cd:0.80,aFov:60,hFov:75,rcG:0.16, rcRX:0.22,bs:[0.055,0.055,0.16],bc:0xff44ff,mdl:'plasma',auto:false,blast:4.5},
+  // 아래 셋은 숫자키가 모자라 휠/무기바 클릭으로 고른다
+  flamer:  {n:'FLAMETHROWER [AUTO]',k:'↕',mag:120,rld:3.0,spd:26,dmg:0.30,spr:0.070,pel:2,cd:0.045,aFov:66,hFov:75,rcG:0.01,rcRX:0.012,bs:[0.05,0.05,0.10],bc:0xff6a11,mdl:'flamer',auto:true,maxLife:0.42,burn:{dps:9,dur:3}},
+  gl:      {n:'GRENADE LAUNCHER',k:'↕',mag:6,rld:2.6,spd:34,dmg:2.2,spr:0.006,pel:1,cd:0.95,aFov:58,hFov:75,rcG:0.17,rcRX:0.23,bs:[0.06,0.06,0.12],bc:0x8fbf3f,mdl:'gl',auto:false,blast:7.5},
+  railgun: {n:'RAILGUN',        k:'↕',mag:3,rld:3.2,spd:0,dmg:9.5,spr:0.000,pel:1,cd:1.6,aFov:26,hFov:75,rcG:0.22,rcRX:0.30,bs:[0.03,0.03,0.4],bc:0x66ddff,mdl:'railgun',auto:false,isLaser:true,scope:true},
 };
 const WKEYS=Object.keys(WD);
 
@@ -2434,26 +2436,6 @@ function buildGun(t){
     add(g,Box(0.010,0.014,0.006,Mm),0.014,0.095,0.018);
     add(g,Box(0.020,0.022,0.016,Mm),0,0.090,0.100,-0.3);
     add(g,Box(0.030,0.008,0.12,Ma),0,-0.008,-0.100);
-  }
-  else if(t==='smg'){
-    add(g,Box(0.098,0.110,0.40,Mg),0,0.010,-0.04);
-    add(g,Box(0.030,0.014,0.38,Ma),0,0.068,-0.04);
-    add(g,Cyl(0.016,0.016,0.34,10,Mm),0,0.010,-0.27,H2);
-    for(let i=0;i<5;i++)add(g,Box(0.020,0.022,0.011,Mb),0,0.025,-0.10-i*0.034);
-    add(g,Cyl(0.022,0.018,0.038,6,Mm),0,0.010,-0.446,H2);
-    add(g,Box(0.048,0.095,0.040,Mr),0,-0.058,-0.22,-0.15);
-    add(g,Box(0.062,0.200,0.058,Mm),0,-0.110,0,-0.18);
-    add(g,Box(0.060,0.012,0.054,Mg),0,-0.215,0,-0.18);
-    add(g,Box(0.072,0.130,0.072,Mr),0,-0.082,0.200,-0.20);
-    add(g,Box(0.018,0.012,0.22,Mm),0,0.008,0.380);
-    add(g,Box(0.018,0.012,0.22,Mm),0,-0.030,0.380);
-    add(g,Box(0.018,0.068,0.012,Mm),0,-0.011,0.490);
-    add(g,Box(0.094,0.008,0.10,Mb),0,-0.014,0.100);
-    add(g,Box(0.006,0.030,0.012,Mm),0,-0.016,0.140,0.3);
-    add(g,Box(0.007,0.020,0.007,Mm),0,0.082,-0.360);
-    add(g,Box(0.028,0.014,0.007,Mm),0,0.080,0.060);
-    add(g,Box(0.008,0.018,0.007,Mm),-0.012,0.086,0.060);
-    add(g,Box(0.008,0.018,0.007,Mm),0.012,0.086,0.060);
   }
   else if(t==='ar'||t==='dmr'){
     const iB=t==='dmr';
@@ -2539,30 +2521,6 @@ function buildGun(t){
     add(g,Box(0.006,0.080,0.010,Mm),-0.022,-0.070,-0.520);
     add(g,Box(0.006,0.080,0.010,Mm),0.022,-0.070,-0.520);
   }
-  else if(t==='revolver'){
-    add(g,Cyl(0.020,0.020,0.34,12,Mm),0,0,-0.20,H2);
-    add(g,Box(0.008,0.012,0.34,Ms),0,0.025,-0.20);
-    add(g,Box(0.006,0.018,0.007,Ms),0,0.038,-0.360);
-    add(g,Cyl(0.044,0.044,0.038,12,Mm),0,0,-0.010,H2);
-    for(let i=0;i<6;i++){const a2=i/6*Math.PI*2;add(g,Cyl(0.010,0.010,0.042,8,mat(0x050505,0.8)),Math.cos(a2)*0.028,Math.sin(a2)*0.028,-0.010,H2);}
-    add(g,Cyl(0.047,0.047,0.004,12,Mb),0,0,-0.030,H2);
-    add(g,Cyl(0.047,0.047,0.004,12,Mb),0,0,0.010,H2);
-    add(g,Box(0.092,0.075,0.26,Mm),0,0,0.070);
-    add(g,Box(0.020,0.020,0.26,Mm),0,0.030,-0.120);
-    add(g,Cyl(0.012,0.012,0.26,8,Mm),0,-0.028,-0.190,H2);
-    add(g,Box(0.022,0.038,0.024,Mm),0,0.048,0.140,-0.4);
-    add(g,Box(0.020,0.010,0.030,Mm),0,0.064,0.100,-0.4);
-    add(g,Box(0.092,0.008,0.110,Mm),0,-0.024,0.180);
-    add(g,Box(0.007,0.032,0.013,Mm),0,-0.026,0.220,0.3);
-    add(g,Box(0.008,0.032,0.008,Mm),0,-0.010,0.120);
-    add(g,Box(0.008,0.032,0.008,Mm),0,-0.010,0.230);
-    add(g,Box(0.088,0.160,0.090,Ml),0,-0.098,0.170,-0.18);
-    add(g,Box(0.006,0.158,0.088,Mw),-0.047,-0.098,0.170,-0.18);
-    add(g,Box(0.006,0.158,0.088,Mw),0.047,-0.098,0.170,-0.18);
-    add(g,Box(0.034,0.014,0.008,Mm),0,0.044,0.100);
-    add(g,Box(0.010,0.018,0.008,Mm),-0.014,0.050,0.100);
-    add(g,Box(0.010,0.018,0.008,Mm),0.014,0.050,0.100);
-  }
   else if(t==='lmg'){
     add(g,Box(0.118,0.148,0.70,Mg),0,0.010,-0.04);
     add(g,Cyl(0.022,0.020,0.88,12,Mm),0,0.010,-0.58,H2);
@@ -2646,30 +2604,70 @@ function buildGun(t){
     add(g,Box(0.008,0.070,0.016,Mm),-0.052,-0.010,0.540);
     add(g,Box(0.008,0.070,0.016,Mm),0.052,-0.010,0.540);
   }
-  else if(t==='crossbow'){
-    add(g,Box(0.072,0.080,0.56,Mw),0,-0.010,-0.030);
-    add(g,Box(0.066,0.074,0.52,Ml),0,-0.010,-0.030);
-    add(g,Box(0.024,0.022,0.62,Ma),0,0.042,-0.030);
-    add(g,Box(0.012,0.010,0.58,Mb),0,0.042,-0.030);
-    add(g,Box(0.380,0.022,0.048,Mw),0,0.040,-0.140);
-    add(g,Box(0.024,0.034,0.040,Mm),-0.190,0.040,-0.140);
-    add(g,Box(0.024,0.034,0.040,Mm),0.190,0.040,-0.140);
-    add(g,Box(0.006,0.006,0.372,mat(0xddddaa,0.9)),-0.093,0.062,-0.140,0,0,0.52);
-    add(g,Box(0.006,0.006,0.372,mat(0xddddaa,0.9)),0.093,0.062,-0.140,0,0,-0.52);
-    add(g,Box(0.008,0.050,0.080,Mm),-0.060,-0.018,-0.300);
-    add(g,Box(0.008,0.050,0.080,Mm),0.060,-0.018,-0.300);
-    add(g,Box(0.124,0.008,0.074,Mm),0,-0.040,-0.300);
-    add(g,Box(0.060,0.060,0.076,mat(0x333322,0.7)),0,0.012,0.100);
-    add(g,Box(0.007,0.042,0.013,Mm),0,-0.020,0.130,0.3);
-    add(g,Box(0.062,0.008,0.088,Mm),0,-0.018,0.100);
-    add(g,Box(0.026,0.014,0.32,Ma),0,0.056,0.040);
-    for(let i=0;i<5;i++)add(g,Box(0.028,0.008,0.010,Mg),0,0.064,-0.06+i*0.036);
-    add(g,Cyl(0.020,0.020,0.200,10,mat(0x111111,0.4,0.3)),0,0.088,0.040,H2);
-    add(g,Cyl(0.012,0.012,0.008,10,mat(0x003344,0.2,0.5,0x000011)),0,0.088,-0.060,H2);
-    add(g,Box(0.010,0.018,0.060,Ms),0,0.054,-0.120);
-    add(g,Box(0.068,0.072,0.18,Mw),0,-0.014,0.400);
-    add(g,Box(0.063,0.065,0.10,Ml),0,-0.012,0.520,0.14);
-    add(g,Box(0.060,0.028,0.12,Mw),0,0.044,0.400);
+  else if(t==='autoshot'){
+    // 드럼 탄창 자동 산탄총 — 짧고 굵은 총열에 원통 드럼
+    add(g,Box(0.115,0.140,0.44,Mg),0,0,-0.04);
+    add(g,Cyl(0.026,0.026,0.50,12,Mm),0,0.010,-0.36,H2);
+    add(g,Cyl(0.030,0.030,0.016,12,Ms),0,0.010,-0.60,H2);
+    add(g,Cyl(0.088,0.088,0.070,16,Mb),0,-0.075,-0.02,0,0,H2);
+    add(g,Cyl(0.060,0.060,0.078,16,Mg),0,-0.075,-0.02,0,0,H2);
+    for(let i=0;i<6;i++){const a=i/6*Math.PI*2;add(g,Cyl(0.016,0.016,0.074,8,Mco),Math.cos(a)*0.055,-0.075+Math.sin(a)*0.055,-0.02,0,0,H2);}
+    add(g,Box(0.016,0.016,0.26,Mm),0,0.052,-0.30);
+    add(g,Box(0.098,0.070,0.150,Ml),0,-0.006,-0.26);
+    add(g,Box(0.104,0.008,0.11,Mg),0,-0.026,0.170);
+    add(g,Box(0.008,0.030,0.008,Mg),0,-0.014,0.120);
+    add(g,Box(0.007,0.030,0.013,Mm),0,-0.028,0.180,0.3);
+    add(g,Box(0.100,0.130,0.24,Mb),0,-0.008,0.340);
+    add(g,Box(0.094,0.038,0.13,Mg),0,0.062,0.410);
+  }
+  else if(t==='flamer'){
+    // 화염방사기 — 등짐 연료통 대신 본체 위에 압력 탱크 두 개
+    add(g,Box(0.100,0.110,0.40,Mg),0,0,-0.02);
+    add(g,Cyl(0.020,0.020,0.46,12,Mm),0,0.006,-0.34,H2);
+    add(g,Cyl(0.028,0.028,0.055,12,Mb),0,0.006,-0.56,H2);
+    add(g,Cyl(0.010,0.010,0.030,8,Mc),0,0.030,-0.56,H2);     // 점화 불씨
+    add(g,Cyl(0.052,0.052,0.30,14,Mr),-0.052,0.090,0.16,H2);
+    add(g,Cyl(0.052,0.052,0.30,14,Mr),0.052,0.090,0.16,H2);
+    add(g,Cyl(0.054,0.054,0.012,14,Ms),-0.052,0.090,0.005,H2);
+    add(g,Cyl(0.054,0.054,0.012,14,Ms),0.052,0.090,0.005,H2);
+    add(g,Box(0.014,0.014,0.26,Mm),0,0.056,-0.18);
+    add(g,Box(0.095,0.008,0.10,Mg),0,-0.024,0.140);
+    add(g,Box(0.008,0.028,0.008,Mg),0,-0.012,0.100);
+    add(g,Box(0.007,0.028,0.013,Mm),0,-0.026,0.150,0.3);
+    add(g,Box(0.090,0.120,0.20,Ml),0,-0.006,0.300);
+    add(g,Box(0.012,0.070,0.12,Mg),-0.056,0.010,-0.02);
+  }
+  else if(t==='gl'){
+    // 유탄발사기 — 굵은 저압 총열 + 회전 탄창
+    add(g,Box(0.110,0.125,0.34,Mg),0,0,-0.02);
+    add(g,Cyl(0.045,0.045,0.44,14,Mm),0,0.014,-0.32,H2);
+    add(g,Cyl(0.050,0.050,0.018,14,Ms),0,0.014,-0.53,H2);
+    add(g,Cyl(0.082,0.082,0.135,16,Mb),0,-0.010,0.02,0,0,H2);
+    for(let i=0;i<6;i++){const a=i/6*Math.PI*2;add(g,Cyl(0.024,0.024,0.140,10,Mg),Math.cos(a)*0.048,-0.010+Math.sin(a)*0.048,0.02,0,0,H2);}
+    add(g,Box(0.016,0.014,0.22,Mm),0,0.062,-0.26);
+    add(g,Box(0.012,0.026,0.012,Ms),0,0.082,-0.34);
+    add(g,Box(0.100,0.008,0.11,Mg),0,-0.026,0.190);
+    add(g,Box(0.008,0.030,0.008,Mg),0,-0.014,0.140);
+    add(g,Box(0.007,0.030,0.013,Mm),0,-0.028,0.200,0.3);
+    add(g,Box(0.098,0.130,0.26,Mw),0,-0.008,0.360);
+    add(g,Box(0.092,0.038,0.14,Ml),0,0.062,0.430);
+  }
+  else if(t==='railgun'){
+    // 레일건 — 평행한 두 레일 사이로 탄을 가속시킨다
+    add(g,Box(0.090,0.105,0.40,Mb),0,0,-0.02);
+    add(g,Box(0.022,0.030,0.86,Ma),-0.042,0.030,-0.44);
+    add(g,Box(0.022,0.030,0.86,Ma),0.042,0.030,-0.44);
+    for(let i=0;i<5;i++){add(g,Box(0.100,0.014,0.020,Mc),0,0.030,-0.20-i*0.16);}
+    add(g,Cyl(0.030,0.030,0.16,14,Mg),0,0.030,0.04,H2);
+    add(g,Cyl(0.034,0.034,0.030,14,Mc),0,0.030,0.14,H2);      // 축전기
+    add(g,Box(0.016,0.016,0.30,Mm),0,0.070,-0.22);
+    add(g,Box(0.044,0.040,0.12,Mb),0,0.096,-0.10);            // 조준경
+    add(g,Cyl(0.020,0.020,0.10,12,Mb),0,0.096,-0.10,H2);
+    add(g,Box(0.086,0.008,0.11,Mb),0,-0.024,0.180);
+    add(g,Box(0.008,0.030,0.008,Mb),0,-0.012,0.130);
+    add(g,Box(0.007,0.030,0.013,Mm),0,-0.026,0.190,0.3);
+    add(g,Box(0.088,0.125,0.26,Mg),0,-0.006,0.350);
+    add(g,Box(0.082,0.036,0.13,Mb),0,0.058,0.420);
   }
   return g;
 }
@@ -4948,22 +4946,22 @@ function makeBullet(wd){
 const laserBeams=[];
 
 const STAGES=[
-  {id:1, name:'훈련장',     sub:'TRAINING GROUND',    icon:'🏕️', waves:3,waveBase:6, diff:1,hpMult:0.88, spawnBase:2200,spd:3.0,weapons:['pistol','smg'],                                                    fogColor:0x0a1408,fogNear:60,fogFar:450,ambCol:0x5a6850,desc:'기초 훈련 구역. 기본 무기만 지급.'},
-  {id:2, name:'도시 골목',  sub:'URBAN ALLEY',         icon:'🏘️', waves:3,waveBase:8, diff:1,hpMult:1.12, spawnBase:2000,spd:3.5,weapons:['pistol','smg','ar'],                                               fogColor:0x080c11,fogNear:50,fogFar:400,ambCol:0x606878,desc:'콘크리트 골목. 근·중거리 교전.'},
-  {id:3, name:'산업 단지',  sub:'INDUSTRIAL ZONE',     icon:'🏭', waves:4,waveBase:10,diff:2,hpMult:1.38, spawnBase:1800,spd:3.8,weapons:['pistol','smg','ar','shotgun'],                                     fogColor:0x110e06,fogNear:45,fogFar:380,ambCol:0x706050,desc:'공장 지대. 짧은 사거리 전투.'},
-  {id:4, name:'항구',       sub:'HARBOR',              icon:'⚓', waves:4,waveBase:12,diff:2,hpMult:1.5, spawnBase:1700,spd:4.0,weapons:['ar','smg','revolver','sniper'],                                    fogColor:0x060e16,fogNear:40,fogFar:350,ambCol:0x405070,desc:'안개 낀 항구. 원거리 우위.'},
-  {id:5, name:'야간 정글',  sub:'NIGHT JUNGLE',        icon:'🌙', waves:4,waveBase:13,diff:3,hpMult:1.75, spawnBase:1500,spd:4.5,weapons:['ar','shotgun','smg','sniper','dmr'],                              fogColor:0x010804,fogNear:25,fogFar:200,ambCol:0x203018,desc:'칠흑 속 정글. 시야 극히 제한.'},
-  {id:6, name:'핵 발전소',  sub:'NUCLEAR PLANT',       icon:'☢️', waves:4,waveBase:15,diff:3,hpMult:2, spawnBase:1400,spd:4.8,weapons:['ar','dmr','lmg','sniper','revolver'],                              fogColor:0x0a1a08,fogNear:35,fogFar:300,ambCol:0x3a6030,desc:'방사능 오염 구역. 중화기 해금.'},
-  {id:7, name:'군사 기지',  sub:'MILITARY BASE',       icon:'🪖', waves:5,waveBase:16,diff:4,hpMult:2.25, spawnBase:1300,spd:5.2,weapons:['ar','dmr','lmg','smg','sniper','shotgun','revolver'],              fogColor:0x080c11,fogNear:45,fogFar:380,ambCol:0x506070,desc:'중무장 엘리트 부대. 중화기 전투.'},
-  {id:8, name:'폐허 도시',  sub:'RUINED CITY',         icon:'🏚️', waves:5,waveBase:18,diff:4,hpMult:2.5, spawnBase:1200,spd:5.5,weapons:['ar','dmr','lmg','sniper','minigun','laser'],                       fogColor:0x120808,fogNear:35,fogFar:280,ambCol:0x704040,desc:'폐허가 된 도시. 돌아오지 못할 수도.'},
-  {id:9, name:'요새',       sub:'FORTRESS',            icon:'🏰', waves:5,waveBase:20,diff:4,hpMult:2.88, spawnBase:1100,spd:5.8,weapons:['ar','dmr','lmg','sniper','minigun','laser','crossbow'],             fogColor:0x0a0a1a,fogNear:40,fogFar:340,ambCol:0x404060,desc:'난공불락 요새. 최정예 부대가 지킨다.'},
-  {id:10,name:'극지 작전',  sub:'ARCTIC OPS',          icon:'❄️', waves:5,waveBase:22,diff:5,hpMult:3.25, spawnBase:1000,spd:6.2,weapons:['sniper','lmg','minigun','dmr','laser'],                            fogColor:0x0c1820,fogNear:30,fogFar:250,ambCol:0x607080,desc:'극한 환경. 스나이퍼·중화기만 사용 가능.'},
-  {id:11,name:'지하 벙커',  sub:'UNDERGROUND BUNKER',  icon:'🕳️', waves:6,waveBase:25,diff:5,hpMult:3.75, spawnBase:900, spd:6.8,weapons:['shotgun','smg','plasma','minigun','lmg','ar','dmr','laser','crossbow'],fogColor:0x050508,fogNear:20,fogFar:180,ambCol:0x302835,desc:'탈출구 없는 지하 벙커. 근접전 지옥.'},
-  {id:12,name:'최후의 전투',sub:'FINAL STAND',          icon:'💀', waves:6,waveBase:30,diff:5,hpMult:4.75, spawnBase:750, spd:7.5,weapons:['pistol','smg','ar','shotgun','sniper','revolver','lmg','dmr','laser','plasma','minigun','crossbow'],fogColor:0x140005,fogNear:35,fogFar:280,ambCol:0x603040,desc:'지옥의 최전선. 모든 무기. 살아남아라.'},
-  {id:13,name:'사막 폭풍',  sub:'DESERT STORM',          icon:'🏜️', waves:5,waveBase:24,diff:5,hpMult:4, spawnBase:900, spd:6.2,weapons:['ar','dmr','lmg','sniper','smg','revolver','shotgun'],                                  fogColor:0x3a2810,fogNear:35,fogFar:300,ambCol:0xa88860,desc:'끝없는 사막. 피라미드를 지키는 고대의 군단.'},
-  {id:14,name:'사이버 도시',sub:'CYBER CITY',            icon:'🌃', waves:5,waveBase:26,diff:5,hpMult:4.25, spawnBase:850, spd:6.8,weapons:['laser','plasma','dmr','ar','minigun','lmg','crossbow'],                          fogColor:0x080820,fogNear:35,fogFar:320,ambCol:0x4060a0,desc:'네온 빛 미래 도시. 자동화된 보안 무기가 전부.'},
-  {id:15,name:'수중 시설',  sub:'UNDERWATER FACILITY',   icon:'🌊', waves:5,waveBase:28,diff:5,hpMult:4.5, spawnBase:800, spd:6.0,weapons:['shotgun','smg','ar','dmr','sniper','laser'],                                    fogColor:0x041830,fogNear:28,fogFar:260,ambCol:0x305880,desc:'해저 깊숙한 연구 시설. 산소가 부족하다.'},
-  {id:16,name:'화산 분화구',sub:'VOLCANO CRATER',        icon:'🌋', waves:6,waveBase:32,diff:5,hpMult:5.25, spawnBase:700, spd:7.2,weapons:['pistol','smg','ar','shotgun','sniper','revolver','lmg','dmr','laser','plasma','minigun','crossbow'],fogColor:0x180404,fogNear:30,fogFar:260,ambCol:0x603020,desc:'끓는 용암 위의 분화구. 모든 게 불타고 있다.'},
+  {id:1, name:'훈련장',     sub:'TRAINING GROUND',    icon:'🏕️', waves:3,waveBase:6, diff:1,hpMult:0.88, spawnBase:2200,spd:3.0,weapons:['pistol','autoshot'],                                                    fogColor:0x0a1408,fogNear:60,fogFar:450,ambCol:0x5a6850,desc:'기초 훈련 구역. 기본 무기만 지급.'},
+  {id:2, name:'도시 골목',  sub:'URBAN ALLEY',         icon:'🏘️', waves:3,waveBase:8, diff:1,hpMult:1.12, spawnBase:2000,spd:3.5,weapons:['pistol','autoshot','ar'],                                               fogColor:0x080c11,fogNear:50,fogFar:400,ambCol:0x606878,desc:'콘크리트 골목. 근·중거리 교전.'},
+  {id:3, name:'산업 단지',  sub:'INDUSTRIAL ZONE',     icon:'🏭', waves:4,waveBase:10,diff:2,hpMult:1.38, spawnBase:1800,spd:3.8,weapons:['pistol','autoshot','ar','shotgun','flamer'],                                     fogColor:0x110e06,fogNear:45,fogFar:380,ambCol:0x706050,desc:'공장 지대. 짧은 사거리 전투.'},
+  {id:4, name:'항구',       sub:'HARBOR',              icon:'⚓', waves:4,waveBase:12,diff:2,hpMult:1.5, spawnBase:1700,spd:4.0,weapons:['ar','autoshot','dmr','sniper'],                                    fogColor:0x060e16,fogNear:40,fogFar:350,ambCol:0x405070,desc:'안개 낀 항구. 원거리 우위.'},
+  {id:5, name:'야간 정글',  sub:'NIGHT JUNGLE',        icon:'🌙', waves:4,waveBase:13,diff:3,hpMult:1.75, spawnBase:1500,spd:4.5,weapons:['ar','shotgun','autoshot','sniper','dmr'],                              fogColor:0x010804,fogNear:25,fogFar:200,ambCol:0x203018,desc:'칠흑 속 정글. 시야 극히 제한.'},
+  {id:6, name:'핵 발전소',  sub:'NUCLEAR PLANT',       icon:'☢️', waves:4,waveBase:15,diff:3,hpMult:2, spawnBase:1400,spd:4.8,weapons:['ar','dmr','lmg','sniper','gl'],                              fogColor:0x0a1a08,fogNear:35,fogFar:300,ambCol:0x3a6030,desc:'방사능 오염 구역. 중화기 해금.'},
+  {id:7, name:'군사 기지',  sub:'MILITARY BASE',       icon:'🪖', waves:5,waveBase:16,diff:4,hpMult:2.25, spawnBase:1300,spd:5.2,weapons:['ar','dmr','lmg','autoshot','sniper','shotgun','gl'],              fogColor:0x080c11,fogNear:45,fogFar:380,ambCol:0x506070,desc:'중무장 엘리트 부대. 중화기 전투.'},
+  {id:8, name:'폐허 도시',  sub:'RUINED CITY',         icon:'🏚️', waves:5,waveBase:18,diff:4,hpMult:2.5, spawnBase:1200,spd:5.5,weapons:['ar','dmr','lmg','sniper','minigun','laser','gl'],                       fogColor:0x120808,fogNear:35,fogFar:280,ambCol:0x704040,desc:'폐허가 된 도시. 돌아오지 못할 수도.'},
+  {id:9, name:'요새',       sub:'FORTRESS',            icon:'🏰', waves:5,waveBase:20,diff:4,hpMult:2.88, spawnBase:1100,spd:5.8,weapons:['ar','dmr','lmg','sniper','minigun','laser','railgun','gl'],             fogColor:0x0a0a1a,fogNear:40,fogFar:340,ambCol:0x404060,desc:'난공불락 요새. 최정예 부대가 지킨다.'},
+  {id:10,name:'극지 작전',  sub:'ARCTIC OPS',          icon:'❄️', waves:5,waveBase:22,diff:5,hpMult:3.25, spawnBase:1000,spd:6.2,weapons:['sniper','lmg','minigun','dmr','laser','railgun'],                            fogColor:0x0c1820,fogNear:30,fogFar:250,ambCol:0x607080,desc:'극한 환경. 스나이퍼·중화기만 사용 가능.'},
+  {id:11,name:'지하 벙커',  sub:'UNDERGROUND BUNKER',  icon:'🕳️', waves:6,waveBase:25,diff:5,hpMult:3.75, spawnBase:900, spd:6.8,weapons:['shotgun','autoshot','plasma','minigun','lmg','ar','dmr','laser','railgun','flamer','gl'],fogColor:0x050508,fogNear:20,fogFar:180,ambCol:0x302835,desc:'탈출구 없는 지하 벙커. 근접전 지옥.'},
+  {id:12,name:'최후의 전투',sub:'FINAL STAND',          icon:'💀', waves:6,waveBase:30,diff:5,hpMult:4.75, spawnBase:750, spd:7.5,weapons:['pistol','autoshot','ar','shotgun','sniper','dmr','lmg','laser','plasma','minigun','railgun','flamer','gl'],fogColor:0x140005,fogNear:35,fogFar:280,ambCol:0x603040,desc:'지옥의 최전선. 모든 무기. 살아남아라.'},
+  {id:13,name:'사막 폭풍',  sub:'DESERT STORM',          icon:'🏜️', waves:5,waveBase:24,diff:5,hpMult:4, spawnBase:900, spd:6.2,weapons:['ar','dmr','lmg','sniper','autoshot','shotgun','gl'],                                  fogColor:0x3a2810,fogNear:35,fogFar:300,ambCol:0xa88860,desc:'끝없는 사막. 피라미드를 지키는 고대의 군단.'},
+  {id:14,name:'사이버 도시',sub:'CYBER CITY',            icon:'🌃', waves:5,waveBase:26,diff:5,hpMult:4.25, spawnBase:850, spd:6.8,weapons:['laser','plasma','dmr','ar','minigun','lmg','railgun'],                          fogColor:0x080820,fogNear:35,fogFar:320,ambCol:0x4060a0,desc:'네온 빛 미래 도시. 자동화된 보안 무기가 전부.'},
+  {id:15,name:'수중 시설',  sub:'UNDERWATER FACILITY',   icon:'🌊', waves:5,waveBase:28,diff:5,hpMult:4.5, spawnBase:800, spd:6.0,weapons:['shotgun','autoshot','ar','dmr','sniper','laser','flamer'],                                    fogColor:0x041830,fogNear:28,fogFar:260,ambCol:0x305880,desc:'해저 깊숙한 연구 시설. 산소가 부족하다.'},
+  {id:16,name:'화산 분화구',sub:'VOLCANO CRATER',        icon:'🌋', waves:6,waveBase:32,diff:5,hpMult:5.25, spawnBase:700, spd:7.2,weapons:['pistol','autoshot','ar','shotgun','sniper','dmr','lmg','laser','plasma','minigun','railgun','flamer','gl'],fogColor:0x180404,fogNear:30,fogFar:260,ambCol:0x603020,desc:'끓는 용암 위의 분화구. 모든 게 불타고 있다.'},
 ];
 let currentStageId=1,stageWaveNum=1;
 let pickedUpgrades=[]; // 현재 스테이지에서 선택한 업그레이드 ID 목록 (이어하기 시 재적용)
@@ -5060,7 +5058,7 @@ document.addEventListener('keydown',e=>{
     useSkill('q');
   }
   if(e.code==='Space'&&onGnd&&ctrl.isLocked&&!gameOver){yVel=JUMP*mods.jumpMult;onGnd=false;}
-  const mp={Digit1:'pistol',Digit2:'smg',Digit3:'ar',Digit4:'shotgun',Digit5:'sniper',Digit6:'revolver',Digit7:'lmg',Digit8:'dmr',Digit9:'laser',Digit0:'plasma'};
+  const mp={Digit1:'pistol',Digit2:'ar',Digit3:'shotgun',Digit4:'autoshot',Digit5:'sniper',Digit6:'dmr',Digit7:'lmg',Digit8:'minigun',Digit9:'laser',Digit0:'plasma'};
   if(mp[e.code]&&getCurStage().weapons.includes(mp[e.code]))switchWep(mp[e.code]);
 });
 document.getElementById('menu-btn').addEventListener('click',goToMenu);
@@ -5208,6 +5206,9 @@ function fireSingle(){
     b.position.copy(camera.position).addScaledVector(dir,0.9);b.position.y-=0.08;
     b.quaternion.setFromUnitVectors(new THREE.Vector3(0,0,1),dir);
     b.userData.vel=dir.clone().multiplyScalar(wD.spd);b.userData.life=0;
+    if(wD.maxLife)b.userData.maxLife=wD.maxLife;
+    if(wD.blast)b.userData.blast=wD.blast;
+    if(wD.burn)b.userData.burn=wD.burn;
     scene.add(b);bullets.push(b);
   }
   ammo--;ammoEl.innerText=ammo;
@@ -5259,7 +5260,7 @@ function fireLaser(){
     const eld=wD.dmg*mods.dmgMult*lhz.mult*_lCrit*_lBrsk;
     ud.hp-=eld;ud.flashT=0.15;ehpFlash=1.5;
     showHitZone(lhz,eld);
-    dmgTxt.innerText=(lhz.name==='HEAD'?'🎯 ':'')+'LASER -'+eld.toFixed(1);
+    dmgTxt.innerText=(lhz.name==='HEAD'?'🎯 ':'')+(wD.mdl==='railgun'?'RAIL':'LASER')+' -'+eld.toFixed(1);
     if(ud.hp<=0){spawnFX(h.e.position.clone());_lastKilledEnemy=h.e;scene.remove(h.e);toRemove.push(h.j);onKill();killed++;}
     else ehpTxt.innerText='['+lhz.name+'] 적 HP: '+ud.hp.toFixed(1)+' / '+ud.maxHP;
   }
@@ -5270,7 +5271,7 @@ function fireLaser(){
   const mid=origin.clone().lerp(endPt,0.5);
   const core=new THREE.Mesh(new THREE.CylinderGeometry(0.018,0.018,maxDist,8),new THREE.MeshBasicMaterial({color:0xffffff,transparent:true,opacity:0.95}));
   core.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir);core.position.copy(mid);scene.add(core);laserBeams.push({mesh:core,initLife:0.12,life:0.12});
-  const glow=new THREE.Mesh(new THREE.CylinderGeometry(0.055,0.055,maxDist,8),new THREE.MeshBasicMaterial({color:0x00ffff,transparent:true,opacity:0.35}));
+  const glow=new THREE.Mesh(new THREE.CylinderGeometry(0.055,0.055,maxDist,8),new THREE.MeshBasicMaterial({color:wD.bc,transparent:true,opacity:0.35}));
   glow.quaternion.setFromUnitVectors(new THREE.Vector3(0,1,0),dir);glow.position.copy(mid);scene.add(glow);laserBeams.push({mesh:glow,initLife:0.12,life:0.12});
   fireFl.style.background='rgba(0,220,255,0.18)';setTimeout(()=>fireFl.style.background='rgba(255,255,255,0)',80);
   ammo--;ammoEl.innerText=ammo;if(ammo<=0)startReload();addRecoil();
@@ -5543,6 +5544,20 @@ function sweepHitZone(p0,p1,ex,ez,hbXZ,hbYMax,escl){
   }
   return best?{zone:best,pos:bestPos}:null;
 }
+// 착탄 폭발 — 반경 안의 적에게 거리 비례 피해. skipIdx 는 이미 직격을 맞은 적.
+function blastAt(pos,radius,dmg,skipIdx){
+  spawnExplosionFX(pos);
+  for(let k=enemies.length-1;k>=0;k--){
+    if(k===skipIdx)continue;
+    const ed=enemies[k];
+    const d=pos.distanceTo(ed.position);
+    if(d>radius)continue;
+    ed.userData.hp-=dmg*(1-d/radius*0.6);   // 가장자리는 40%
+    ed.userData.flashT=0.25;
+    if(ed.userData.hp<=0){spawnFX(ed.position.clone());_lastKilledEnemy=ed;scene.remove(ed);enemies.splice(k,1);onKill();}
+  }
+}
+
 function updateBullets(dt){
   for(let i=bullets.length-1;i>=0;i--){
     const b=bullets[i];
@@ -5567,6 +5582,11 @@ function updateBullets(dt){
         if(mods._nextOneShot)mods._nextOneShot=false;
         const effectiveDmg=wD.dmg*mods.dmgMult*hz.mult*_bCrit*_bBrsk*_bOneShot;
         ud.hp-=effectiveDmg;ud.flashT=0.15;ehpFlash=1.5;
+        // 화염방사기: 맞은 적에게 화상(중독과 같은 지속 피해 칸을 쓴다)
+        if(b.userData.burn){
+          ud.poisonT=Math.max(ud.poisonT||0,b.userData.burn.dur);
+          ud.poisonDps=Math.max(ud.poisonDps||0,b.userData.burn.dps*mods.dmgMult);
+        }
         showHitZone(hz,effectiveDmg);
         if(hz.name==='HEAD'){hitFl.style.background='rgba(255,60,0,0.12)';setTimeout(()=>hitFl.style.background='rgba(255,0,0,0)',100);}
         dmgTxt.innerText=(hz.name==='HEAD'?'🎯 ':'')+'-'+effectiveDmg.toFixed(1);
@@ -5581,6 +5601,8 @@ function updateBullets(dt){
           }
           _lastKilledEnemy=e;scene.remove(e);enemies.splice(j,1);onKill();ehpTxt.innerText='💀 처치! ['+hz.name+']';
         }
+        // 유탄/플라즈마: 착탄 지점에서 터져 주변까지 쓸어버린다
+        if(b.userData.blast)blastAt(b.position.clone(),b.userData.blast,effectiveDmg*0.6,j);
         scene.remove(b);bullets.splice(i,1);rm=true;break;
       }
     }
@@ -5617,7 +5639,7 @@ function updateBullets(dt){
       spawnImpactFX(b.position.clone());
       scene.remove(b);bullets.splice(i,1);continue;
     }
-    if(rm)continue;if(b.userData.life>3.8){scene.remove(b);bullets.splice(i,1);}
+    if(rm)continue;if(b.userData.life>(b.userData.maxLife||3.8)){scene.remove(b);bullets.splice(i,1);}
   }
   if(ehpFlash>0){ehpFlash-=dt;if(ehpFlash<=0){ehpTxt.innerText='';dmgTxt.innerText='';}}
 }
