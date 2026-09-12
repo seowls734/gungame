@@ -700,7 +700,7 @@ function updateDrone(dt){
     if(d<closestDist){closestDist=d;closest=e;}
   }
   if(closest&&closestDist<28){
-    closest.userData.hp-=18*dt*mods.dmgMult;
+    closest.userData.hp-=18*dt*dmgM();
     closest.userData.flashT=0.1;
     if(closest.userData.hp<=0){
       spawnFX(closest.position.clone());
@@ -740,7 +740,7 @@ function updateMines(dt){
         spawnExplosionFX(ep);
         for(let k=enemies.length-1;k>=0;k--){
           if(enemies[k].position.distanceTo(ep)<6){
-            enemies[k].userData.hp-=40*mods.dmgMult;enemies[k].userData.flashT=0.25;
+            enemies[k].userData.hp-=40*dmgM();enemies[k].userData.flashT=0.25;
             if(enemies[k].userData.hp<=0){spawnFX(enemies[k].position.clone());_lastKilledEnemy=enemies[k];scene.remove(enemies[k]);enemies.splice(k,1);onKill();}
           }
         }
@@ -759,13 +759,13 @@ const CLASSES=[
     skills:{
       c:{name:'돌격',    icon:'💨', cd:11,  desc:'3초간 이동속도 1.6배, 받는 피해 70% 감소',
          fn:()=>{
-           mods.speedMult*=1.6;
+           mods.spdTemp*=1.6;
            const oldArmor=mods.armorMult;mods.armorMult*=0.30;
            spawnAfterimagePulse(yawObj.position.clone(),0x00aaff);
            spawnDashStreaks(yawObj.position.clone(),0x66ccff);
            spawnSkillFX(0x00aaff,15);
            showSkillNotify('💨 돌격!');
-           setTimeout(()=>{mods.speedMult/=1.6;mods.armorMult=oldArmor;},3000);
+           setTimeout(()=>{mods.spdTemp/=1.6;mods.armorMult=oldArmor;},3000);
          }},
       e:{name:'방어막',  icon:'🛡️', cd:21, desc:'5초간 받는 피해 65% 감소',
          fn:()=>{
@@ -776,11 +776,11 @@ const CLASSES=[
          }},
       q:{name:'광전사', icon:'😤', cd:34, desc:'7초간 피해 1.8배, 연사속도 1.25배, HP 지속 회복',
          fn:()=>{
-           mods.dmgMult*=1.8;mods.fireRateMult*=0.80;mods.regenRate+=3;
+           mods.dmgTemp*=1.8;mods.fireTemp*=0.80;mods.regenRate+=3;
            spawnRageAura(yawObj.position.clone(),0xff3300);
            spawnSkillFX(0xff2200,16);
            showSkillNotify('😤 광전사!');
-           setTimeout(()=>{mods.dmgMult/=1.8;mods.fireRateMult/=0.80;mods.regenRate-=3;},7000);
+           setTimeout(()=>{mods.dmgTemp/=1.8;mods.fireTemp/=0.80;mods.regenRate-=3;},7000);
          }},
     }
   },
@@ -825,7 +825,7 @@ const CLASSES=[
              const t2=(dx*dir.x+dz*dir.z)/denom;if(t2<0||t2>120)continue;
              const cx=origin.x+dir.x*t2,cz=origin.z+dir.z*t2;
              if(Math.sqrt((cx-e.position.x)**2+(cz-e.position.z)**2)>2.5)continue;
-             e.userData.hp-=28*mods.dmgMult;e.userData.flashT=0.2;
+             e.userData.hp-=28*dmgM();e.userData.flashT=0.2;
              if(e.userData.hp<=0){spawnFX(e.position.clone());_lastKilledEnemy=e;scene.remove(e);enemies.splice(j,1);onKill();}
            }
            spawnBeamFX(origin.clone().setY(yawObj.position.y+1.2),dir,60,0xff2244);
@@ -880,7 +880,7 @@ const CLASSES=[
            setTimeout(()=>{
              for(let j=enemies.length-1;j>=0;j--){
                if(enemies[j].position.distanceTo(landPos)<6){
-                 enemies[j].userData.hp-=26.6*mods.dmgMult;enemies[j].userData.flashT=0.2;
+                 enemies[j].userData.hp-=26.6*dmgM();enemies[j].userData.flashT=0.2;
                  if(enemies[j].userData.hp<=0){spawnFX(enemies[j].position.clone());_lastKilledEnemy=enemies[j];scene.remove(enemies[j]);enemies.splice(j,1);onKill();}
                }
              }
@@ -926,7 +926,7 @@ const CLASSES=[
            for(const e of enemies){const d=yawObj.position.distanceTo(e.position);if(d<closestDist){closestDist=d;closest=e;}}
            if(closest){
              const tp=closest.position.clone().setY(1.5);
-             closest.userData.hp-=closest.userData.maxHP*0.5*mods.dmgMult;closest.userData.flashT=0.4;
+             closest.userData.hp-=closest.userData.maxHP*0.5*dmgM();closest.userData.flashT=0.4;
              // 검호 슬래시 임팩트 + 마커 + 보텍스
              spawnSlashImpactFX(tp);
              spawnSlashImpactFX(tp);
@@ -956,7 +956,7 @@ const CLASSES=[
                const dx=e.position.x-origin.x,dz=e.position.z-origin.z;
                const denom=dir.x*dir.x+dir.z*dir.z;if(denom<0.001)continue;
                const t2=(dx*dir.x+dz*dir.z)/denom;if(t2<0||t2>12)continue;
-               e.userData.hp-=2.1*mods.dmgMult;e.userData.flashT=0.1;
+               e.userData.hp-=2.1*dmgM();e.userData.flashT=0.1;
                if(e.userData.hp<=0){spawnFX(e.position.clone());_lastKilledEnemy=e;scene.remove(e);enemies.splice(j,1);onKill();}
              }
              // 매 틱 화염 콘 — 0.2초 간격으로만(부담↓)
@@ -974,7 +974,7 @@ const CLASSES=[
              t2+=0.2;
              for(let j=enemies.length-1;j>=0;j--){
                if(enemies[j].position.distanceTo(fp)<3.5){
-                 enemies[j].userData.hp-=2.8*mods.dmgMult;enemies[j].userData.flashT=0.1;
+                 enemies[j].userData.hp-=2.8*dmgM();enemies[j].userData.flashT=0.1;
                  if(enemies[j].userData.hp<=0){spawnFX(enemies[j].position.clone());_lastKilledEnemy=enemies[j];scene.remove(enemies[j]);enemies.splice(j,1);onKill();}
                }
              }
@@ -996,7 +996,7 @@ const CLASSES=[
          fn:()=>{
            for(let j=enemies.length-1;j>=0;j--){
              if(yawObj.position.distanceTo(enemies[j].position)<18){
-               enemies[j].userData.hp-=35*mods.dmgMult;enemies[j].userData.flashT=0.3;
+               enemies[j].userData.hp-=35*dmgM();enemies[j].userData.flashT=0.3;
                if(enemies[j].userData.hp<=0){spawnFX(enemies[j].position.clone());_lastKilledEnemy=enemies[j];scene.remove(enemies[j]);enemies.splice(j,1);onKill();}
              }
            }
@@ -1013,11 +1013,11 @@ const CLASSES=[
     skills:{
       c:{name:'오버클럭', icon:'⚙️', cd:17, desc:'6초간 연사속도 1.8배, 이동속도 1.6배',
          fn:()=>{
-           mods.fireRateMult*=0.55;mods.speedMult*=1.6;
+           mods.fireTemp*=0.55;mods.spdTemp*=1.6;
            spawnVortexFX(yawObj.position.clone(),0x00ffff,8,1.5);
            spawnDigitalGlitch(yawObj.position.clone(),0x00ffff);
            showSkillNotify('⚙️ 오버클럭!');
-           setTimeout(()=>{mods.fireRateMult/=0.55;mods.speedMult/=1.6;},6000);
+           setTimeout(()=>{mods.fireTemp/=0.55;mods.spdTemp/=1.6;},6000);
          }},
       e:{name:'실드 충전', icon:'🔋', cd:25, desc:'5초간 피해 무효 실드',
          fn:()=>{
@@ -1031,7 +1031,7 @@ const CLASSES=[
          fn:()=>{
            for(let j=enemies.length-1;j>=0;j--){
              if(yawObj.position.distanceTo(enemies[j].position)<12){
-               enemies[j].userData.hp-=140*mods.dmgMult;enemies[j].userData.flashT=0.3;
+               enemies[j].userData.hp-=140*dmgM();enemies[j].userData.flashT=0.3;
                if(enemies[j].userData.hp<=0){spawnFX(enemies[j].position.clone());_lastKilledEnemy=enemies[j];scene.remove(enemies[j]);enemies.splice(j,1);onKill();}
              }
            }
@@ -1051,7 +1051,7 @@ const CLASSES=[
            let closest=null,closestDist=60;
            for(const e of enemies){const d=yawObj.position.distanceTo(e.position);if(d<closestDist){closestDist=d;closest=e;}}
            if(closest){
-             closest.userData.hp-=closest.userData.maxHP*0.2*mods.dmgMult;
+             closest.userData.hp-=closest.userData.maxHP*0.2*dmgM();
              closest.userData.flashT=0.4;
              if(closest.userData.hp<=0){spawnFX(closest.position.clone());_lastKilledEnemy=closest;scene.remove(closest);const idx=enemies.indexOf(closest);if(idx>=0){enemies.splice(idx,1);onKill();}}
              else spawnTargetMarker(closest.position.clone().setY(2.5),0xff4444);
@@ -1071,7 +1071,7 @@ const CLASSES=[
              const t2=(dx*dir.x+dz*dir.z)/denom;if(t2<0||t2>100)continue;
              const cx=origin.x+dir.x*t2,cz=origin.z+dir.z*t2;
              if(Math.sqrt((cx-e.position.x)**2+(cz-e.position.z)**2)>1.5)continue;
-             e.userData.hp-=e.userData.maxHP*0.2*mods.dmgMult;e.userData.flashT=0.2;
+             e.userData.hp-=e.userData.maxHP*0.2*dmgM();e.userData.flashT=0.2;
              // 독구름 입자
              for(let i=0;i<3;i++){
                const sp=_makeParticle('ember',0x66ff44,0.1+Math.random()*0.05);
@@ -1104,7 +1104,7 @@ const CLASSES=[
              if(t2<0||t2>5)continue;
              const cx=origin.x+dir.x*t2,cz=origin.z+dir.z*t2;
              if(Math.sqrt((cx-e.position.x)**2+(cz-e.position.z)**2)>2.5)continue;
-             e.userData.hp-=31.5*mods.dmgMult;e.userData.flashT=0.25;
+             e.userData.hp-=31.5*dmgM();e.userData.flashT=0.25;
              e.position.x+=dir.x*4;e.position.z+=dir.z*4;
              if(e.userData.hp<=0){spawnFX(e.position.clone());_lastKilledEnemy=e;scene.remove(e);enemies.splice(j,1);onKill();}
            }
@@ -1156,7 +1156,7 @@ const CLASSES=[
              if(t2<0||t2>80)continue;
              const cx=origin.x+dir.x*t2,cz=origin.z+dir.z*t2;
              if(Math.sqrt((cx-e.position.x)**2+(cz-e.position.z)**2)>1.4)continue;
-             e.userData.hp-=24.5*mods.dmgMult;e.userData.flashT=0.2;
+             e.userData.hp-=24.5*dmgM();e.userData.flashT=0.2;
              spawnSlashImpactFX(e.position.clone().setY(1.5));
              if(e.userData.hp<=0){spawnFX(e.position.clone());_lastKilledEnemy=e;scene.remove(e);enemies.splice(j,1);onKill();}
            }
@@ -1174,7 +1174,7 @@ const CLASSES=[
                const e=enemies[j];
                const dx=cp.x-e.position.x,dz=cp.z-e.position.z;
                if(dx*dx+dz*dz<49){
-                 e.userData.hp-=1.68*mods.dmgMult;e.userData.flashT=0.08;
+                 e.userData.hp-=1.68*dmgM();e.userData.flashT=0.08;
                  if(e.userData.hp<=0){spawnFX(e.position.clone());_lastKilledEnemy=e;scene.remove(e);enemies.splice(j,1);onKill();}
                }
              }
@@ -1201,7 +1201,7 @@ const CLASSES=[
              const e=enemies[j];
              const dx=cp.x-e.position.x,dz=cp.z-e.position.z;
              if(dx*dx+dz*dz<324){
-               e.userData.hp-=42*mods.dmgMult;e.userData.flashT=0.3;
+               e.userData.hp-=42*dmgM();e.userData.flashT=0.3;
                if(e.userData.hp<=0){
                  spawnFX(e.position.clone());
                  spawnSoulRise(e.position.clone(),0xaa66ff,5);
@@ -1276,7 +1276,7 @@ const CLASSES=[
              const e=enemies[j];
              const dx=cp.x-e.position.x,dz=cp.z-e.position.z;
              if(dx*dx+dz*dz<225){
-               e.userData.hp-=28*mods.dmgMult;e.userData.flashT=0.3;
+               e.userData.hp-=28*dmgM();e.userData.flashT=0.3;
                e.userData._origSpd=e.userData._origSpd||e.userData.spdMult;
                e.userData.spdMult=0;
                // 적 위치에 번개 (최대 12개만)
@@ -1334,7 +1334,7 @@ const CLASSES=[
                for(let j=enemies.length-1;j>=0;j--){
                  if(enemies[j].position.distanceTo(epos)<7){
                    const dmg=55*(1-enemies[j].position.distanceTo(epos)/7);
-                   enemies[j].userData.hp-=dmg*mods.dmgMult;enemies[j].userData.flashT=0.25;
+                   enemies[j].userData.hp-=dmg*dmgM();enemies[j].userData.flashT=0.25;
                    if(enemies[j].userData.hp<=0){spawnFX(enemies[j].position.clone());_lastKilledEnemy=enemies[j];scene.remove(enemies[j]);enemies.splice(j,1);onKill();}
                  }
                }
@@ -1362,7 +1362,7 @@ const CLASSES=[
                  spawnExplosionFX(lp);
                  for(let j=enemies.length-1;j>=0;j--){
                    if(enemies[j].position.distanceTo(lp)<5.5){
-                     enemies[j].userData.hp-=29.4*mods.dmgMult;enemies[j].userData.flashT=0.25;
+                     enemies[j].userData.hp-=29.4*dmgM();enemies[j].userData.flashT=0.25;
                      if(enemies[j].userData.hp<=0){spawnFX(enemies[j].position.clone());_lastKilledEnemy=enemies[j];scene.remove(enemies[j]);enemies.splice(j,1);onKill();}
                    }
                  }
@@ -1394,7 +1394,7 @@ const CLASSES=[
                  spawnExplosionFX(lp);
                  for(let j=enemies.length-1;j>=0;j--){
                    if(enemies[j].position.distanceTo(lp)<6){
-                     enemies[j].userData.hp-=31.5*mods.dmgMult;enemies[j].userData.flashT=0.3;
+                     enemies[j].userData.hp-=31.5*dmgM();enemies[j].userData.flashT=0.3;
                      if(enemies[j].userData.hp<=0){spawnFX(enemies[j].position.clone());_lastKilledEnemy=enemies[j];scene.remove(enemies[j]);enemies.splice(j,1);onKill();}
                    }
                  }
@@ -1422,7 +1422,7 @@ const CLASSES=[
              const t2=(dx*dir.x+dz*dir.z)/denom;if(t2<0||t2>10)continue;
              const cx=origin.x+dir.x*t2,cz=origin.z+dir.z*t2;
              if(Math.sqrt((cx-e.position.x)**2+(cz-e.position.z)**2)>2.2)continue;
-             e.userData.hp-=84*mods.dmgMult;e.userData.flashT=0.3;
+             e.userData.hp-=84*dmgM();e.userData.flashT=0.3;
              spawnSlashImpactFX(e.position.clone().setY(1.5));
              if(e.userData.hp<=0){spawnFX(e.position.clone());_lastKilledEnemy=e;scene.remove(e);enemies.splice(j,1);onKill();}
            }
@@ -1431,11 +1431,11 @@ const CLASSES=[
          }},
       e:{name:'회피', icon:'💨', cd:14, desc:'1.5초간 받는 피해 70% 감소 + 2.5초간 속도 1.8배',
          fn:()=>{
-           const old=mods.armorMult;mods.armorMult*=0.30;mods.speedMult*=1.8;
+           const old=mods.armorMult;mods.armorMult*=0.30;mods.spdTemp*=1.8;
            spawnDodgeFX(yawObj.position.clone(),0xddf0ff);
            showSkillNotify('💨 회피!');
            setTimeout(()=>{mods.armorMult=old;},1500);
-           setTimeout(()=>{mods.speedMult/=1.8;},2500);
+           setTimeout(()=>{mods.spdTemp/=1.8;},2500);
          }},
       q:{name:'무한검극', icon:'⚔️', cd:30, desc:'6초간 0.4초마다 주변 10m 적에 38 피해',
          fn:()=>{
@@ -1449,7 +1449,7 @@ const CLASSES=[
                const e=enemies[j];
                const dx=cp.x-e.position.x,dz=cp.z-e.position.z;
                if(dx*dx+dz*dz<100){
-                 e.userData.hp-=38.5*mods.dmgMult;e.userData.flashT=0.18;hit=true;
+                 e.userData.hp-=38.5*dmgM();e.userData.flashT=0.18;hit=true;
                  spawnSlashImpactFX(e.position.clone().setY(1.5));
                  if(e.userData.hp<=0){spawnFX(e.position.clone());_lastKilledEnemy=e;scene.remove(e);enemies.splice(j,1);onKill();}
                }
@@ -1488,7 +1488,7 @@ const CLASSES=[
                spawnExplosionFX(ep);
                for(let j=enemies.length-1;j>=0;j--){
                  if(enemies[j].position.distanceTo(ep)<7){
-                   enemies[j].userData.hp-=35*mods.dmgMult;enemies[j].userData.flashT=0.3;
+                   enemies[j].userData.hp-=35*dmgM();enemies[j].userData.flashT=0.3;
                    if(enemies[j].userData.hp<=0){spawnFX(enemies[j].position.clone());_lastKilledEnemy=enemies[j];scene.remove(enemies[j]);enemies.splice(j,1);onKill();}
                  }
                }
@@ -1532,7 +1532,7 @@ const CLASSES=[
                const cands=enemies.filter(e=>cp.distanceTo(e.position)<18);
                if(cands.length===0)return;
                const targ=cands[Math.floor(Math.random()*cands.length)];
-               targ.userData.hp-=21*mods.dmgMult;targ.userData.flashT=0.25;
+               targ.userData.hp-=21*dmgM();targ.userData.flashT=0.25;
                // 하늘 → 적 번개 호
                const skyPt=targ.position.clone();skyPt.y=10;
                spawnLightningArc(skyPt,targ.position.clone().setY(0.5),0xeeeeff);
@@ -1579,12 +1579,12 @@ const CLASSES=[
          }},
       q:{name:'시간가속', icon:'⏩', cd:38, desc:'8초간 연사속도 1.4배, 이동속도 1.6배',
          fn:()=>{
-           mods.fireRateMult*=0.70;mods.speedMult*=1.6;
+           mods.fireTemp*=0.70;mods.spdTemp*=1.6;
            spawnVortexFX(yawObj.position.clone(),0xffcc88,12,2);
            spawnDashStreaks(yawObj.position.clone(),0xffaa66);
            spawnTimePulse(yawObj.position.clone(),0xffcc88);
            showSkillNotify('⏩ 시간가속!');
-           setTimeout(()=>{mods.fireRateMult/=0.70;mods.speedMult/=1.6;},8000);
+           setTimeout(()=>{mods.fireTemp/=0.70;mods.spdTemp/=1.6;},8000);
          }},
     }
   },
@@ -1622,7 +1622,7 @@ const CLASSES=[
            if(closest){
              const startPos=closest.position.clone();
              spawnPsiGrip(startPos,0xff88ff);
-             closest.userData.hp-=42*mods.dmgMult;closest.userData.flashT=0.5;
+             closest.userData.hp-=42*dmgM();closest.userData.flashT=0.5;
              const dir=new THREE.Vector3();camera.getWorldDirection(dir);
              closest.position.x+=dir.x*6;closest.position.z+=dir.z*6;
              // 던지기 streak
@@ -1679,7 +1679,7 @@ const CLASSES=[
              if(t2<0||t2>8)continue;
              const cx=origin.x+dir.x*t2,cz=origin.z+dir.z*t2;
              if(Math.sqrt((cx-e.position.x)**2+(cz-e.position.z)**2)>2.2)continue;
-             const dmg=40*mods.dmgMult;
+             const dmg=40*dmgM();
              e.userData.hp-=dmg;e.userData.flashT=0.2;dealt+=dmg;
              spawnSlashImpactFX(e.position.clone().setY(1.5));
              if(e.userData.hp<=0){spawnFX(e.position.clone());_lastKilledEnemy=e;scene.remove(e);enemies.splice(j,1);onKill();}
@@ -1693,7 +1693,7 @@ const CLASSES=[
          }},
       e:{name:'박쥐 무리', icon:'🦇', cd:22, desc:'5초간 이동속도 1.6배 + 받는 피해 40% 감소',
          fn:()=>{
-           const old=mods.armorMult;mods.armorMult*=0.60;mods.speedMult*=1.6;
+           const old=mods.armorMult;mods.armorMult*=0.60;mods.spdTemp*=1.6;
            spawnAfterimagePulse(yawObj.position.clone(),0x550022);
            for(let i=0;i<12;i++){
              const ang=Math.random()*Math.PI*2,r=Math.random()*2;
@@ -1704,7 +1704,7 @@ const CLASSES=[
              scene.add(sm);skillFX.push(sm);
            }
            showSkillNotify('🦇 박쥐 무리!');
-           setTimeout(()=>{mods.armorMult=old;mods.speedMult/=1.6;},5000);
+           setTimeout(()=>{mods.armorMult=old;mods.spdTemp/=1.6;},5000);
          }},
       q:{name:'피의 향연', icon:'🩸', cd:36, desc:'주변 16m 모든 적에 38 피해 + 적중 1체당 HP +4',
          fn:()=>{
@@ -1713,7 +1713,7 @@ const CLASSES=[
              const e=enemies[j];
              const dx=cp.x-e.position.x,dz=cp.z-e.position.z;
              if(dx*dx+dz*dz<256){
-               e.userData.hp-=38.5*mods.dmgMult;e.userData.flashT=0.3;hits++;
+               e.userData.hp-=38.5*dmgM();e.userData.flashT=0.3;hits++;
                spawnSoulRise(e.position.clone(),0xff0033,4);
                if(e.userData.hp<=0){spawnFX(e.position.clone());_lastKilledEnemy=e;scene.remove(e);enemies.splice(j,1);onKill();}
              }
@@ -1740,7 +1740,7 @@ const CLASSES=[
              for(let j=enemies.length-1;j>=0;j--){
                const e=enemies[j];
                if(e.position.distanceTo(tp)<4){
-                 const dmg=(e===closest?75:35)*mods.dmgMult;
+                 const dmg=(e===closest?75:35)*dmgM();
                  e.userData.hp-=dmg;e.userData.flashT=0.25;
                  if(e.userData.hp<=0){spawnFX(e.position.clone());_lastKilledEnemy=e;scene.remove(e);enemies.splice(j,1);onKill();}
                }
@@ -1764,7 +1764,7 @@ const CLASSES=[
            for(let j=enemies.length-1;j>=0;j--){
              const e=enemies[j];
              if(cp.distanceTo(e.position)<16){
-               e.userData.hp-=45.5*mods.dmgMult;e.userData.flashT=0.3;
+               e.userData.hp-=45.5*dmgM();e.userData.flashT=0.3;
                if(e.userData.hp<=0){spawnFX(e.position.clone());_lastKilledEnemy=e;scene.remove(e);enemies.splice(j,1);onKill();}
              }
            }
@@ -1792,7 +1792,7 @@ const CLASSES=[
              if(!closest)break;
              hitSet.add(closest);
              spawnLightningArc(from,closest.position.clone().setY(1.5),0x66ccff);
-             closest.userData.hp-=24.5*mods.dmgMult;closest.userData.flashT=0.2;
+             closest.userData.hp-=24.5*dmgM();closest.userData.flashT=0.2;
              from=closest.position.clone().setY(1.5);
              lastPos=closest.position.clone();chained++;
            }
@@ -1812,10 +1812,10 @@ const CLASSES=[
                spawnLightningArc(cp.clone().setY(1.5),e.position.clone().setY(1.5),0x66ccff);
              }
            }
-           mods.fireRateMult*=0.70;
+           mods.fireTemp*=0.70;
            spawnSkillFX(0x66ccff,14);
            showSkillNotify('🔌 정전 과부하!');
-           setTimeout(()=>{for(const e of enemies){if(e.userData._origSpd){e.userData.spdMult=e.userData._origSpd;}}mods.fireRateMult/=0.70;},5000);
+           setTimeout(()=>{for(const e of enemies){if(e.userData._origSpd){e.userData.spdMult=e.userData._origSpd;}}mods.fireTemp/=0.70;},5000);
          }},
       q:{name:'폭풍 강림', icon:'⛈️', cd:38, desc:'18m 내 모든 적에 42 피해 (낙뢰)',
          fn:()=>{
@@ -1824,7 +1824,7 @@ const CLASSES=[
              const e=enemies[j];
              const dx=cp.x-e.position.x,dz=cp.z-e.position.z;
              if(dx*dx+dz*dz<324){
-               e.userData.hp-=42*mods.dmgMult;e.userData.flashT=0.3;
+               e.userData.hp-=42*dmgM();e.userData.flashT=0.3;
                spawnLightningArc(cp.clone().setY(9),e.position.clone().setY(1.5),0x88ddff);
                if(e.userData.hp<=0){spawnFX(e.position.clone());_lastKilledEnemy=e;scene.remove(e);enemies.splice(j,1);onKill();}
              }
@@ -1851,7 +1851,7 @@ const CLASSES=[
              const t2=(dx*dir.x+dz*dir.z)/denom;if(t2<0||t2>70)continue;
              const cx=origin.x+dir.x*t2,cz=origin.z+dir.z*t2;
              if(Math.sqrt((cx-e.position.x)**2+(cz-e.position.z)**2)>1.8)continue;
-             e.userData.hp-=21*mods.dmgMult;e.userData.flashT=0.2;
+             e.userData.hp-=21*dmgM();e.userData.flashT=0.2;
              e.userData._origSpd=e.userData._origSpd||e.userData.spdMult;
              e.userData.spdMult=e.userData._origSpd*0.4;
              if(e.userData.hp<=0){spawnFX(e.position.clone());_lastKilledEnemy=e;scene.remove(e);enemies.splice(j,1);onKill();}
@@ -1865,7 +1865,7 @@ const CLASSES=[
            const cp=yawObj.position.clone();
            for(const e of enemies){
              if(cp.distanceTo(e.position)<8){
-               e.userData.hp-=14*mods.dmgMult;e.userData.flashT=0.3;
+               e.userData.hp-=14*dmgM();e.userData.flashT=0.3;
                e.userData._origSpd=e.userData._origSpd||e.userData.spdMult;
                e.userData.spdMult=e.userData._origSpd*0.1;
              }
@@ -1882,7 +1882,7 @@ const CLASSES=[
            for(let j=enemies.length-1;j>=0;j--){
              const e=enemies[j];
              if(cp.distanceTo(e.position)<16){
-               e.userData.hp-=35*mods.dmgMult;e.userData.flashT=0.3;
+               e.userData.hp-=35*dmgM();e.userData.flashT=0.3;
                e.userData._origSpd=e.userData._origSpd||e.userData.spdMult;
                e.userData.spdMult=e.userData._origSpd*0.3;
                if(e.userData.hp<=0){spawnFX(e.position.clone());_lastKilledEnemy=e;scene.remove(e);enemies.splice(j,1);onKill();}
@@ -1905,12 +1905,12 @@ const CLASSES=[
     skills:{
       c:{name:'질주',    icon:'🏃', cd:8,  desc:'5초간 이동속도 2배, 연사속도 1.25배',
          fn:()=>{
-           mods.speedMult*=2.0;mods.fireRateMult*=0.80;
+           mods.spdTemp*=2.0;mods.fireTemp*=0.80;
            spawnAfterimagePulse(yawObj.position.clone(),0x33ffcc);
            spawnDashStreaks(yawObj.position.clone(),0x66ffdd);
            spawnSkillFX(0x33ffcc,14);
            showSkillNotify('🏃 질주!');
-           setTimeout(()=>{mods.speedMult/=2.0;mods.fireRateMult/=0.80;},5000);
+           setTimeout(()=>{mods.spdTemp/=2.0;mods.fireTemp/=0.80;},5000);
          }},
       e:{name:'섬광 돌진', icon:'⚡', cd:15, desc:'조준 방향으로 16m 돌진, 경로상의 적을 밀치며 피해',
          fn:()=>{
@@ -1933,7 +1933,7 @@ const CLASSES=[
              if(t2<0||t2>moved)continue;
              const cx=fromPos.x+dir.x*t2,cz=fromPos.z+dir.z*t2;
              if(Math.sqrt((cx-e.position.x)**2+(cz-e.position.z)**2)>2.2)continue;
-             e.userData.hp-=45*mods.dmgMult;e.userData.flashT=0.25;
+             e.userData.hp-=45*dmgM();e.userData.flashT=0.25;
              e.position.x+=dir.x*5;e.position.z+=dir.z*5;
              if(e.userData.hp<=0){spawnFX(e.position.clone());_lastKilledEnemy=e;scene.remove(e);enemies.splice(j,1);onKill();}
            }
@@ -1943,14 +1943,14 @@ const CLASSES=[
          }},
       q:{name:'초가속', icon:'🌪️', cd:32, desc:'9초간 이동속도 2.3배, 받는 피해 60% 감소',
          fn:()=>{
-           mods.speedMult*=2.3;
+           mods.spdTemp*=2.3;
            const old=mods.armorMult;mods.armorMult*=0.40;
            spawnAfterimagePulse(yawObj.position.clone(),0x00ffaa);
            spawnDashStreaks(yawObj.position.clone(),0x00ffaa);
            spawnGroundSigil(yawObj.position.clone(),0x00ffaa,3,2);
            spawnSkillFX(0x00ffaa,18);
            showSkillNotify('🌪️ 초가속!');
-           setTimeout(()=>{mods.speedMult/=2.3;mods.armorMult=old;},9000);
+           setTimeout(()=>{mods.spdTemp/=2.3;mods.armorMult=old;},9000);
          }},
     }
   },
@@ -1968,7 +1968,7 @@ const CLASSES=[
            for(const e of enemies){
              if(cp.distanceTo(e.position)>14)continue;
              e.userData.poisonT=Math.max(e.userData.poisonT||0,8);
-             e.userData.poisonDps=Math.max(e.userData.poisonDps||0,22*mods.dmgMult);
+             e.userData.poisonDps=Math.max(e.userData.poisonDps||0,22*dmgM());
              n++;
            }
            spawnGroundSigil(cp,0x66dd33,14,2.5);
@@ -1987,7 +1987,7 @@ const CLASSES=[
              for(const e of enemies){
                if(e===sd||sd.position.distanceTo(e.position)>9)continue;
                e.userData.poisonT=Math.max(e.userData.poisonT||0,6);
-               e.userData.poisonDps=Math.max(e.userData.poisonDps||0,22*mods.dmgMult);
+               e.userData.poisonDps=Math.max(e.userData.poisonDps||0,22*dmgM());
              }
            }
            spawnSkillFX(0x99ff44,14);
@@ -1997,7 +1997,7 @@ const CLASSES=[
          fn:()=>{
            for(const e of enemies){
              e.userData.poisonT=Math.max(e.userData.poisonT||0,12);
-             e.userData.poisonDps=Math.max(e.userData.poisonDps||0,30*mods.dmgMult);
+             e.userData.poisonDps=Math.max(e.userData.poisonDps||0,30*dmgM());
              e.userData._origSpd=e.userData._origSpd||e.userData.spdMult;
              e.userData.spdMult=e.userData._origSpd*0.55;
            }
@@ -2059,7 +2059,7 @@ const CLASSES=[
              if(cp.distanceTo(e.position)>26)continue;
              e.position.x=cx+(Math.random()-0.5)*2;
              e.position.z=cz+(Math.random()-0.5)*2;
-             e.userData.hp-=120*mods.dmgMult;e.userData.flashT=0.35;
+             e.userData.hp-=120*dmgM();e.userData.flashT=0.35;
              if(e.userData.hp<=0){spawnFX(e.position.clone());_lastKilledEnemy=e;scene.remove(e);enemies.splice(j,1);onKill();}
            }
            const core=new THREE.Vector3(cx,1.5,cz);
@@ -2080,9 +2080,9 @@ const CLASSES=[
       c:{name:'룰렛', icon:'🎰', cd:7, desc:'무작위 버프 하나를 8초간 (피해/연사/속도/재생 중)',
          fn:()=>{
            const table=[
-             {nm:'피해 2배',   col:0xff4444, ap:()=>{mods.dmgMult*=2;       return ()=>{mods.dmgMult/=2;};}},
-             {nm:'연사 2배',   col:0xffaa22, ap:()=>{mods.fireRateMult*=0.5;return ()=>{mods.fireRateMult/=0.5;};}},
-             {nm:'속도 1.8배', col:0x44ccff, ap:()=>{mods.speedMult*=1.8;   return ()=>{mods.speedMult/=1.8;};}},
+             {nm:'피해 2배',   col:0xff4444, ap:()=>{mods.dmgTemp*=2;       return ()=>{mods.dmgTemp/=2;};}},
+             {nm:'연사 2배',   col:0xffaa22, ap:()=>{mods.fireTemp*=0.5;return ()=>{mods.fireTemp/=0.5;};}},
+             {nm:'속도 1.8배', col:0x44ccff, ap:()=>{mods.spdTemp*=1.8;   return ()=>{mods.spdTemp/=1.8;};}},
              {nm:'재생 +5',    col:0x44ff77, ap:()=>{mods.regenRate+=5;     return ()=>{mods.regenRate-=5;};}},
            ];
            const pick=table[Math.floor(Math.random()*table.length)];
@@ -2094,13 +2094,13 @@ const CLASSES=[
          }},
       e:{name:'올인', icon:'💰', cd:20, desc:'10초간 주는 피해 2.5배 — 대신 받는 피해도 2배',
          fn:()=>{
-           mods.dmgMult*=2.5;
+           mods.dmgTemp*=2.5;
            const old=mods.armorMult;mods.armorMult*=2;
            spawnRageAura(yawObj.position.clone(),0xffcc00);
            spawnGroundSigil(yawObj.position.clone(),0xffcc00,3,2);
            spawnSkillFX(0xffcc00,18);
            showSkillNotify('💰 올인!');
-           setTimeout(()=>{mods.dmgMult/=2.5;mods.armorMult=old;},10000);
+           setTimeout(()=>{mods.dmgTemp/=2.5;mods.armorMult=old;},10000);
          }},
       q:{name:'잭팟', icon:'🥇', cd:35, desc:'적마다 35% 확률로 즉사, 빗나가면 90 피해',
          fn:()=>{
@@ -2112,7 +2112,7 @@ const CLASSES=[
                spawnTargetMarker(e.position.clone().setY(2.5),0xffdd22);
                e.userData.hp=0;
              } else {
-               e.userData.hp-=90*mods.dmgMult;e.userData.flashT=0.3;
+               e.userData.hp-=90*dmgM();e.userData.flashT=0.3;
              }
              if(e.userData.hp<=0){spawnFX(e.position.clone());_lastKilledEnemy=e;scene.remove(e);enemies.splice(j,1);onKill();if(hit)kills++;}
            }
@@ -3450,7 +3450,7 @@ function explodeBarrel(g){
     const dSq=dx*dx+dz*dz;
     if(dSq<radSq){
       const falloff=1-Math.sqrt(dSq)/radius;
-      e.userData.hp-=dmg*falloff*mods.dmgMult;e.userData.flashT=0.25;
+      e.userData.hp-=dmg*falloff*dmgM();e.userData.flashT=0.25;
       if(e.userData.hp<=0){spawnFX(e.position.clone());_lastKilledEnemy=e;scene.remove(e);enemies.splice(j,1);onKill();}
     }
   }
@@ -4409,7 +4409,7 @@ function applyBuff(type){
   playSound('pickup');
   const el=document.getElementById('ehp-text');
   if(type==='heal'){playerHP=Math.min(playerHP+30,100);hpBar.style.width=playerHP+'%';if(el){el.innerText='💊 체력 +30!';setTimeout(()=>el.innerText='',2000);}}
-  else if(type==='speed'){mods.speedMult=Math.min(mods.speedMult+0.2,1.6);if(el){el.innerText='⚡ 속도 부스트!';setTimeout(()=>el.innerText='',2000);}}
+  else if(type==='speed'){mods.speedMult=Math.min(mods.speedMult+0.2,1.4);if(el){el.innerText='⚡ 속도 부스트!';setTimeout(()=>el.innerText='',2000);}}
   else if(type==='ammo'){ammo=Math.floor(wD.mag*mods.magMult);ammoEl.innerText=ammo;rldTxt.innerText='';if(el){el.innerText='🔴 탄약 보충!';setTimeout(()=>el.innerText='',2000);}}
   else if(type==='dmg'){mods.dmgMult=Math.min(mods.dmgMult+0.25,2.5);if(el){el.innerText='🔥 피해 증가!';setTimeout(()=>el.innerText='',2000);}}
 }
@@ -4837,7 +4837,7 @@ function doStartStage(sid){
   if(droneObj){scene.remove(droneObj);droneObj=null;}droneTimer=0;
   mines.forEach(m=>scene.remove(m.mesh));mines.length=0;
   skillFX.forEach(p=>scene.remove(p));skillFX.length=0;
-  mods.dmgMult=1;mods.speedMult=1;mods.armorMult=1;mods.splashRad=0;mods.fireRateMult=1;mods.lifeSteal=0;mods.critChance=0;mods.magMult=1;mods.jumpMult=1;mods.regenRate=0;mods.thorns=0;mods.rldMult=1;mods.skillCdMult=1;mods._scavenger=false;mods._berserker=false;
+  mods.dmgMult=1;mods.speedMult=1;mods.armorMult=1;mods.splashRad=0;mods.fireRateMult=1;mods.lifeSteal=0;mods.critChance=0;mods.magMult=1;mods.jumpMult=1;mods.regenRate=0;mods.thorns=0;mods.rldMult=1;mods.skillCdMult=1;mods.spdTemp=1;mods.dmgTemp=1;mods.fireTemp=1;mods._scavenger=false;mods._berserker=false;
   // 클래스 고유 패시브(질풍병의 상시 이동속도 등) — 업그레이드 재적용보다 먼저
   if(currentClass&&currentClass.passive){try{currentClass.passive.ap();}catch(err){console.warn('클래스 패시브 적용 실패:',err);}}
   // 이어하기 시 이전 업그레이드 재적용 — 같은 스테이지에 진입 중인 경우만
@@ -4910,6 +4910,11 @@ function showStageSelect(){
 
 // 업그레이드가 겹겹이 쌓여 후반에 무적이 되는 것을 막는 상한선.
 // (스킬의 일시 버프는 원래 값으로 되돌리므로 여기서 건드리지 않는다)
+// base × 일시버프 — 실제로 쓰이는 최종 배율
+function spdM(){return mods.speedMult*mods.spdTemp;}
+function dmgM(){return mods.dmgMult*mods.dmgTemp;}
+function fireM(){return mods.fireRateMult*mods.fireTemp;}
+
 function clampMods(){
   mods.dmgMult=Math.min(mods.dmgMult,2.8);
   mods.armorMult=Math.max(mods.armorMult,0.45);
@@ -5012,7 +5017,10 @@ let wave=1,waveKills=0,waveTarget=10;
 let waveActive=true,choosingStage=false;
 let spawnInterval=null;
 
-const mods={dmgMult:1.0,speedMult:1.0,armorMult:1.0,splashRad:0.0,fireRateMult:1.0,lifeSteal:0.0,critChance:0.0,magMult:1.0,jumpMult:1.0,regenRate:0.0,thorns:0.0,rldMult:1.0,skillCdMult:1.0};
+const mods={dmgMult:1.0,speedMult:1.0,armorMult:1.0,splashRad:0.0,fireRateMult:1.0,lifeSteal:0.0,critChance:0.0,magMult:1.0,jumpMult:1.0,regenRate:0.0,thorns:0.0,rldMult:1.0,skillCdMult:1.0,
+  // 스킬이 거는 일시 버프. base(업그레이드·패시브)와 분리해 둬야 clampMods 가
+  // 버프 도중에 값을 깎아버리고, 버프가 풀릴 때 나눗셈이 어긋나는 일이 없다.
+  spdTemp:1.0,dmgTemp:1.0,fireTemp:1.0};
 
 const UPGRADES=[
   {id:'medkit',   icon:'🩹',name:'긴급 의무키트',desc:'즉시 HP +25 회복',tag:'HEAL',tc:'tag-heal',apply:()=>{playerHP=Math.min(playerHP+25,100);hpBar.style.width=playerHP+'%';}},
@@ -5284,7 +5292,7 @@ function fireLaser(){
     const lhz=getHitZone(laserHitPos,h.e.position,h.escl||1);
     const _lCrit=mods.critChance>0&&Math.random()<mods.critChance?1.8:1;
     const _lBrsk=mods._berserker&&playerHP<=40?1.8:1;
-    const eld=wD.dmg*mods.dmgMult*lhz.mult*_lCrit*_lBrsk;
+    const eld=wD.dmg*dmgM()*lhz.mult*_lCrit*_lBrsk;
     ud.hp-=eld;ud.flashT=0.15;ehpFlash=1.5;
     showHitZone(lhz,eld);
     dmgTxt.innerText=(lhz.name==='HEAD'?'🎯 ':'')+(wD.mdl==='railgun'?'RAIL':'LASER')+' -'+eld.toFixed(1);
@@ -5308,7 +5316,7 @@ function shoot(){
   if(gameOver||reloading||cdT>0||gamePaused)return;
   if(ammo<=0){startReload();return;}
   if(wD.isLaser){fireLaser();}else fireSingle();
-  cdT=wD.cd*mods.fireRateMult;
+  cdT=wD.cd*fireM();
 }
 
 function clearAll(){
@@ -5344,7 +5352,7 @@ function endGame(){
 function updatePlayer(dt){
   crouchAmt+=((crouching?1:0)-crouchAmt)*Math.min(1,dt*12);
   vel.x-=vel.x*10*dt;vel.z-=vel.z*10*dt;
-  const spd=108*mods.speedMult*(crouching?0.5:1);
+  const spd=108*spdM()*(crouching?0.5:1);
   if(mF)vel.z-=spd*dt;if(mB)vel.z+=spd*dt;if(mL)vel.x-=spd*dt;if(mR)vel.x+=spd*dt;
   const px=yawObj.position.x,pz=yawObj.position.z;
   ctrl.moveRight(vel.x*dt);ctrl.moveForward(-vel.z*dt);
@@ -5607,12 +5615,12 @@ function updateBullets(dt){
         const _bBrsk=mods._berserker&&playerHP<=40?1.8:1;
         const _bOneShot=mods._nextOneShot?6:1;
         if(mods._nextOneShot)mods._nextOneShot=false;
-        const effectiveDmg=wD.dmg*mods.dmgMult*hz.mult*_bCrit*_bBrsk*_bOneShot;
+        const effectiveDmg=wD.dmg*dmgM()*hz.mult*_bCrit*_bBrsk*_bOneShot;
         ud.hp-=effectiveDmg;ud.flashT=0.15;ehpFlash=1.5;
         // 화염방사기: 맞은 적에게 화상(중독과 같은 지속 피해 칸을 쓴다)
         if(b.userData.burn){
           ud.poisonT=Math.max(ud.poisonT||0,b.userData.burn.dur);
-          ud.poisonDps=Math.max(ud.poisonDps||0,b.userData.burn.dps*mods.dmgMult);
+          ud.poisonDps=Math.max(ud.poisonDps||0,b.userData.burn.dps*dmgM());
         }
         showHitZone(hz,effectiveDmg);
         if(hz.name==='HEAD'){hitFl.style.background='rgba(255,60,0,0.12)';setTimeout(()=>hitFl.style.background='rgba(255,0,0,0)',100);}
