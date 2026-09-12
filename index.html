@@ -1933,6 +1933,171 @@ const CLASSES=[
          }},
     }
   },
+  // ── 22. 역병술사 ─────────────────────────
+  // 즉발 피해가 아니라 시간에 걸쳐 죽이는 유일한 클래스.
+  // 중독은 적 userData.poisonT/poisonDps 에 쌓이고 updateEnemies 가 매 프레임 깎는다.
+  {
+    id:'plague', name:'역병술사', icon:'☠️',
+    desc:'중독으로 서서히 말려 죽인다.',
+    skills:{
+      c:{name:'역병 구름', icon:'🟢', cd:10, desc:'주변 14m 적을 8초간 중독 (초당 22 피해)',
+         fn:()=>{
+           const cp=yawObj.position.clone();let n=0;
+           for(const e of enemies){
+             if(cp.distanceTo(e.position)>14)continue;
+             e.userData.poisonT=Math.max(e.userData.poisonT||0,8);
+             e.userData.poisonDps=Math.max(e.userData.poisonDps||0,22*mods.dmgMult);
+             n++;
+           }
+           spawnGroundSigil(cp,0x66dd33,14,2.5);
+           spawnNova(cp.clone().setY(1),0x66dd33,14);
+           spawnSkillFX(0x66dd33,16);
+           showSkillNotify('🟢 역병 구름! ('+n+')');
+         }},
+      e:{name:'전염', icon:'🦠', cd:18, desc:'중독된 적의 독을 2배로 키우고 주변 9m 로 퍼뜨린다',
+         fn:()=>{
+           // 이미 중독된 적을 먼저 골라낸 뒤 퍼뜨린다 — 퍼진 독이 또 퍼지지 않게
+           const seeds=enemies.filter(e=>(e.userData.poisonT||0)>0);
+           for(const sd of seeds){
+             sd.userData.poisonDps*=2;
+             sd.userData.poisonT=Math.max(sd.userData.poisonT,6);
+             spawnVortexFX(sd.position.clone(),0x66dd33,6,0.5);
+             for(const e of enemies){
+               if(e===sd||sd.position.distanceTo(e.position)>9)continue;
+               e.userData.poisonT=Math.max(e.userData.poisonT||0,6);
+               e.userData.poisonDps=Math.max(e.userData.poisonDps||0,22*mods.dmgMult);
+             }
+           }
+           spawnSkillFX(0x99ff44,14);
+           showSkillNotify(seeds.length?('🦠 전염! ('+seeds.length+')'):'🦠 퍼뜨릴 독이 없다');
+         }},
+      q:{name:'대역병', icon:'💀', cd:34, desc:'모든 적을 12초간 중독 (초당 30) + 8초간 이동속도 45% 감소',
+         fn:()=>{
+           for(const e of enemies){
+             e.userData.poisonT=Math.max(e.userData.poisonT||0,12);
+             e.userData.poisonDps=Math.max(e.userData.poisonDps||0,30*mods.dmgMult);
+             e.userData._origSpd=e.userData._origSpd||e.userData.spdMult;
+             e.userData.spdMult=e.userData._origSpd*0.55;
+           }
+           const cp=yawObj.position.clone();
+           spawnGroundSigil(cp,0x44aa22,26,4);
+           spawnNova(cp.clone().setY(1),0x44aa22,26);
+           spawnSkillFX(0x44aa22,22);
+           showSkillNotify('💀 대역병!');
+           setTimeout(()=>{for(const e of enemies){if(e.userData._origSpd)e.userData.spdMult=e.userData._origSpd;}},8000);
+         }},
+    }
+  },
+  // ── 23. 중력술사 ─────────────────────────
+  // 피해보다 배치가 무기. 흩어진 적을 한곳에 모아 화력으로 정리하게 만든다.
+  {
+    id:'gravity', name:'중력술사', icon:'🌀',
+    desc:'적을 끌어모아 한번에 처리한다.',
+    skills:{
+      c:{name:'견인', icon:'🧲', cd:9, desc:'22m 안의 적을 눈앞으로 끌어당긴다',
+         fn:()=>{
+           const dir=new THREE.Vector3();camera.getWorldDirection(dir);dir.y=0;
+           if(dir.lengthSq()<0.001)return;dir.normalize();
+           const cp=yawObj.position.clone();
+           const tx=cp.x+dir.x*7, tz=cp.z+dir.z*7;
+           let n=0;
+           for(const e of enemies){
+             if(cp.distanceTo(e.position)>22)continue;
+             // 완전히 겹치지 않게 목표점 주위로 살짝 흩는다
+             e.position.x=tx+(Math.random()-0.5)*3;
+             e.position.z=tz+(Math.random()-0.5)*3;
+             e.userData.flashT=0.2;n++;
+           }
+           spawnPsiGrip(new THREE.Vector3(tx,1.2,tz),0xaa66ff);
+           spawnSkillFX(0xaa66ff,14);
+           showSkillNotify('🧲 견인! ('+n+')');
+         }},
+      e:{name:'중력장', icon:'🌌', cd:17, desc:'8초간 주변 20m 적 이동속도 70% 감소',
+         fn:()=>{
+           const cp=yawObj.position.clone();
+           for(const e of enemies){
+             if(cp.distanceTo(e.position)>20)continue;
+             e.userData._origSpd=e.userData._origSpd||e.userData.spdMult;
+             e.userData.spdMult=e.userData._origSpd*0.30;
+           }
+           spawnGroundSigil(cp,0x7744cc,20,4);
+           spawnSonarRings(cp,0x7744cc,20);
+           showSkillNotify('🌌 중력장!');
+           setTimeout(()=>{for(const e of enemies){if(e.userData._origSpd)e.userData.spdMult=e.userData._origSpd;}},8000);
+         }},
+      q:{name:'블랙홀', icon:'⚫', cd:33, desc:'26m 안의 적을 한 점으로 압축하고 120 피해',
+         fn:()=>{
+           const dir=new THREE.Vector3();camera.getWorldDirection(dir);dir.y=0;
+           if(dir.lengthSq()<0.001)dir.set(0,0,-1);else dir.normalize();
+           const cp=yawObj.position.clone();
+           const cx=cp.x+dir.x*12, cz=cp.z+dir.z*12;
+           for(let j=enemies.length-1;j>=0;j--){
+             const e=enemies[j];
+             if(cp.distanceTo(e.position)>26)continue;
+             e.position.x=cx+(Math.random()-0.5)*2;
+             e.position.z=cz+(Math.random()-0.5)*2;
+             e.userData.hp-=120*mods.dmgMult;e.userData.flashT=0.35;
+             if(e.userData.hp<=0){spawnFX(e.position.clone());_lastKilledEnemy=e;scene.remove(e);enemies.splice(j,1);onKill();}
+           }
+           const core=new THREE.Vector3(cx,1.5,cz);
+           spawnPsiImplosion(core,0x6622cc,26);
+           spawnVortexFX(core,0x6622cc,26,1.2);
+           spawnSkillFX(0x6622cc,20);
+           showSkillNotify('⚫ 블랙홀!');
+         }},
+    }
+  },
+  // ── 24. 도박꾼 ─────────────────────────
+  // 기댓값은 다른 클래스와 비슷하되 분산이 크다. 운이 좋으면 판을 뒤집는다.
+  {
+    id:'gambler', name:'도박꾼', icon:'🎲',
+    desc:'운에 거는 고위험 고수익.',
+    skills:{
+      c:{name:'룰렛', icon:'🎰', cd:7, desc:'무작위 버프 하나를 8초간 (피해/연사/속도/재생 중)',
+         fn:()=>{
+           const table=[
+             {nm:'피해 2배',   col:0xff4444, ap:()=>{mods.dmgMult*=2;       return ()=>{mods.dmgMult/=2;};}},
+             {nm:'연사 2배',   col:0xffaa22, ap:()=>{mods.fireRateMult*=0.5;return ()=>{mods.fireRateMult/=0.5;};}},
+             {nm:'속도 1.8배', col:0x44ccff, ap:()=>{mods.speedMult*=1.8;   return ()=>{mods.speedMult/=1.8;};}},
+             {nm:'재생 +5',    col:0x44ff77, ap:()=>{mods.regenRate+=5;     return ()=>{mods.regenRate-=5;};}},
+           ];
+           const pick=table[Math.floor(Math.random()*table.length)];
+           const undo=pick.ap();
+           spawnRageAura(yawObj.position.clone(),pick.col);
+           spawnSkillFX(pick.col,14);
+           showSkillNotify('🎰 '+pick.nm+'!');
+           setTimeout(undo,8000);
+         }},
+      e:{name:'올인', icon:'💰', cd:20, desc:'10초간 주는 피해 2.5배 — 대신 받는 피해도 2배',
+         fn:()=>{
+           mods.dmgMult*=2.5;
+           const old=mods.armorMult;mods.armorMult*=2;
+           spawnRageAura(yawObj.position.clone(),0xffcc00);
+           spawnGroundSigil(yawObj.position.clone(),0xffcc00,3,2);
+           spawnSkillFX(0xffcc00,18);
+           showSkillNotify('💰 올인!');
+           setTimeout(()=>{mods.dmgMult/=2.5;mods.armorMult=old;},10000);
+         }},
+      q:{name:'잭팟', icon:'🥇', cd:35, desc:'적마다 35% 확률로 즉사, 빗나가면 90 피해',
+         fn:()=>{
+           let kills=0;
+           for(let j=enemies.length-1;j>=0;j--){
+             const e=enemies[j];
+             const hit=Math.random()<0.35;
+             if(hit){
+               spawnTargetMarker(e.position.clone().setY(2.5),0xffdd22);
+               e.userData.hp=0;
+             } else {
+               e.userData.hp-=90*mods.dmgMult;e.userData.flashT=0.3;
+             }
+             if(e.userData.hp<=0){spawnFX(e.position.clone());_lastKilledEnemy=e;scene.remove(e);enemies.splice(j,1);onKill();if(hit)kills++;}
+           }
+           spawnNova(yawObj.position.clone().setY(1),0xffdd22,30);
+           spawnSkillFX(0xffdd22,24);
+           showSkillNotify(kills?('🥇 잭팟! '+kills+'킬'):'🥇 잭팟... 꽝!');
+         }},
+    }
+  },
 ];
 // 스킬 쿨다운 상태
 const skillCD={c:0,e:0,q:0};
@@ -5213,6 +5378,16 @@ function updateEnemies(dt){
     const behavior=ud.behavior||'melee';
     const desiredRange=ud.range||0;
     if(ud.atkCd>0&&!mods._timeStop)ud.atkCd-=dt;
+
+    // ── 중독 — 역병술사가 건 지속 피해. 시간이 흐르는 동안만 깎인다 ──
+    if(ud.poisonT>0&&!mods._timeStop){
+      ud.poisonT-=dt;
+      ud.hp-=(ud.poisonDps||0)*dt;
+      ud.poisonBlink=(ud.poisonBlink||0)-dt;
+      if(ud.poisonBlink<=0){ud.flashT=Math.max(ud.flashT||0,0.1);ud.poisonBlink=0.45;}
+      if(ud.hp<=0){spawnFX(e.position.clone());_lastKilledEnemy=e;scene.remove(e);enemies.splice(i,1);onKill();continue;}
+      if(ud.poisonT<=0){ud.poisonT=0;ud.poisonDps=0;}
+    }
 
     // ── 시간정지 — 이동/공격/접촉피해 모두 정지, 시각 효과는 유지 ──
     if(mods._timeStop){
