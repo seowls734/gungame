@@ -1874,6 +1874,65 @@ const CLASSES=[
          }},
     }
   },
+  // ── 21. 질풍병 ─────────────────────────
+  // 속도 특화 클래스. 다른 클래스가 순간 이동이나 짧은 가속을 가졌다면,
+  // 이 클래스는 상시 빠르고 세 스킬 전부가 속도를 쌓는 방향으로만 작동한다.
+  {
+    id:'sprinter', name:'질풍병', icon:'💨',
+    desc:'속도 특화 돌격병. 상시 이동속도 1.25배.',
+    passive:()=>{ mods.speedMult*=1.25; },
+    skills:{
+      c:{name:'질주',    icon:'🏃', cd:8,  desc:'5초간 이동속도 2배, 연사속도 1.25배',
+         fn:()=>{
+           mods.speedMult*=2.0;mods.fireRateMult*=0.80;
+           spawnAfterimagePulse(yawObj.position.clone(),0x33ffcc);
+           spawnDashStreaks(yawObj.position.clone(),0x66ffdd);
+           spawnSkillFX(0x33ffcc,14);
+           showSkillNotify('🏃 질주!');
+           setTimeout(()=>{mods.speedMult/=2.0;mods.fireRateMult/=0.80;},5000);
+         }},
+      e:{name:'섬광 돌진', icon:'⚡', cd:15, desc:'조준 방향으로 16m 돌진, 경로상의 적을 밀치며 피해',
+         fn:()=>{
+           const dir=new THREE.Vector3();camera.getWorldDirection(dir);
+           dir.y=0;if(dir.lengthSq()<0.001)return;dir.normalize();
+           const fromPos=yawObj.position.clone();
+           // 벙을 통과하지 않도록 1m씩 전진하다가 막히면 거기서 멈춘다
+           let moved=0;
+           for(let i=0;i<16;i++){
+             const nx=yawObj.position.x+dir.x, nz=yawObj.position.z+dir.z;
+             if(isBlocked(nx,nz,PR))break;
+             yawObj.position.x=nx;yawObj.position.z=nz;moved++;
+           }
+           yawObj.position.y=EYH;
+           // 지나온 선분에 걸친 적을 뒤로 밀면서 피해
+           for(let j=enemies.length-1;j>=0;j--){
+             const e=enemies[j];
+             const dx=e.position.x-fromPos.x,dz=e.position.z-fromPos.z;
+             const t2=dx*dir.x+dz*dir.z;
+             if(t2<0||t2>moved)continue;
+             const cx=fromPos.x+dir.x*t2,cz=fromPos.z+dir.z*t2;
+             if(Math.sqrt((cx-e.position.x)**2+(cz-e.position.z)**2)>2.2)continue;
+             e.userData.hp-=45*mods.dmgMult;e.userData.flashT=0.25;
+             e.position.x+=dir.x*5;e.position.z+=dir.z*5;
+             if(e.userData.hp<=0){spawnFX(e.position.clone());_lastKilledEnemy=e;scene.remove(e);enemies.splice(j,1);onKill();}
+           }
+           spawnTeleportFX(fromPos,yawObj.position.clone(),0x33ffcc);
+           spawnSlashFX(fromPos.clone().setY(1.2),dir,Math.max(moved,1),0x33ffcc);
+           showSkillNotify('⚡ 섬광 돌진!');
+         }},
+      q:{name:'초가속', icon:'🌪️', cd:32, desc:'9초간 이동속도 2.3배, 받는 피해 60% 감소',
+         fn:()=>{
+           mods.speedMult*=2.3;
+           const old=mods.armorMult;mods.armorMult*=0.40;
+           spawnAfterimagePulse(yawObj.position.clone(),0x00ffaa);
+           spawnDashStreaks(yawObj.position.clone(),0x00ffaa);
+           spawnGroundSigil(yawObj.position.clone(),0x00ffaa,3,2);
+           spawnSkillFX(0x00ffaa,18);
+           showSkillNotify('🌪️ 초가속!');
+           setTimeout(()=>{mods.speedMult/=2.3;mods.armorMult=old;},9000);
+         }},
+    }
+  },
 ];
 // 스킬 쿨다운 상태
 const skillCD={c:0,e:0,q:0};
@@ -4591,6 +4650,8 @@ function doStartStage(sid){
   mines.forEach(m=>scene.remove(m.mesh));mines.length=0;
   skillFX.forEach(p=>scene.remove(p));skillFX.length=0;
   mods.dmgMult=1;mods.speedMult=1;mods.armorMult=1;mods.splashRad=0;mods.fireRateMult=1;mods.lifeSteal=0;mods.critChance=0;mods.magMult=1;mods.jumpMult=1;mods.regenRate=0;mods.thorns=0;mods._scavenger=false;mods._berserker=false;
+  // 클래스 고유 패시브(질풍병의 상시 이동속도 등) — 업그레이드 재적용보다 먼저
+  if(currentClass&&currentClass.passive){try{currentClass.passive();}catch(err){console.warn('클래스 패시브 적용 실패:',err);}}
   // 이어하기 시 이전 업그레이드 재적용 — 같은 스테이지에 진입 중인 경우만
   pickedUpgrades=(sv.lastStage===sid&&resumeWave>1&&Array.isArray(sv.pickedUpgrades))?[...sv.pickedUpgrades]:[];
   for(const upId of pickedUpgrades){
