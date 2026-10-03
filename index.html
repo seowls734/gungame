@@ -1977,20 +1977,23 @@ const CLASSES=[
            spawnSkillFX(0x99ff44,14);
            showSkillNotify(seeds.length?('🦠 전염! ('+seeds.length+')'):'🦠 퍼뜨릴 독이 없다');
          }},
-      q:{name:'대역병', icon:'💀', cd:34, desc:'모든 적을 12초간 중독 (초당 30) + 8초간 이동속도 45% 감소',
+      q:{name:'대역병', icon:'💀', cd:38, desc:'주변 26m 적을 10초간 중독 (초당 18) + 6초간 이동속도 30% 감소',
          fn:()=>{
+           // 예전엔 맵 전체에 12초×30 이 들어가 웬만한 웨이브가 혼자 정리됐다 — 범위를 이펙트(26m)에 맞춘다
+           const cp=yawObj.position.clone();let n=0;
            for(const e of enemies){
-             e.userData.poisonT=Math.max(e.userData.poisonT||0,12);
-             e.userData.poisonDps=Math.max(e.userData.poisonDps||0,30*dmgM());
+             if(cp.distanceTo(e.position)>26)continue;
+             e.userData.poisonT=Math.max(e.userData.poisonT||0,10);
+             e.userData.poisonDps=Math.max(e.userData.poisonDps||0,18*dmgM());
              e.userData._origSpd=e.userData._origSpd||e.userData.spdMult;
-             e.userData.spdMult=e.userData._origSpd*0.55;
+             e.userData.spdMult=e.userData._origSpd*0.70;
+             n++;
            }
-           const cp=yawObj.position.clone();
            spawnGroundSigil(cp,0x44aa22,26,4);
            spawnNova(cp.clone().setY(1),0x44aa22,26);
            spawnSkillFX(0x44aa22,22);
-           showSkillNotify('💀 대역병!');
-           setTimeout(()=>{for(const e of enemies){if(e.userData._origSpd)e.userData.spdMult=e.userData._origSpd;}},8000);
+           showSkillNotify('💀 대역병! ('+n+')');
+           setTimeout(()=>{for(const e of enemies){if(e.userData._origSpd)e.userData.spdMult=e.userData._origSpd;}},6000);
          }},
     }
   },
@@ -2086,23 +2089,20 @@ const CLASSES=[
            showSkillNotify('💰 올인!');
            setTimeout(()=>{mods.dmgTemp/=2.5;mods.armorMult=old;},10000);
          }},
-      q:{name:'잭팟', icon:'🥇', cd:35, desc:'적마다 35% 확률로 즉사, 빗나가면 90 피해',
+      q:{name:'잭팟', icon:'🥇', cd:35, desc:'적마다 35% 확률로 잭팟 300 피해, 빗나가면 90 피해',
          fn:()=>{
-           let kills=0;
+           // 즉사는 보스까지 한 방에 지워 버려서 큰 피해로 바꿨다
+           let jack=0;
            for(let j=enemies.length-1;j>=0;j--){
              const e=enemies[j];
              const hit=Math.random()<0.35;
-             if(hit){
-               spawnTargetMarker(e.position.clone().setY(2.5),0xffdd22);
-               e.userData.hp=0;
-             } else {
-               e.userData.hp-=90*dmgM();e.userData.flashT=0.3;
-             }
-             if(e.userData.hp<=0){spawnFX(e.position.clone());_lastKilledEnemy=e;scene.remove(e);enemies.splice(j,1);onKill();if(hit)kills++;}
+             if(hit){spawnTargetMarker(e.position.clone().setY(2.5),0xffdd22);jack++;}
+             e.userData.hp-=(hit?300:90)*dmgM();e.userData.flashT=hit?0.45:0.3;
+             if(e.userData.hp<=0){spawnFX(e.position.clone());_lastKilledEnemy=e;scene.remove(e);enemies.splice(j,1);onKill();}
            }
            spawnNova(yawObj.position.clone().setY(1),0xffdd22,30);
            spawnSkillFX(0xffdd22,24);
-           showSkillNotify(kills?('🥇 잭팟! '+kills+'킬'):'🥇 잭팟... 꽝!');
+           showSkillNotify(jack?('🥇 잭팟! '+jack+'명 적중'):'🥇 잭팟... 꽝!');
          }},
     }
   },
