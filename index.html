@@ -5285,6 +5285,9 @@ function endGame(){
   pauseOverlay.classList.remove('active'); // 게임오버 시 일시정지 오버레이 제거
   instrEl.style.display='block';
   instrEl.innerHTML='<h1>GAME OVER</h1><p style="font-size:18px;margin:12px 0;color:#ff5555;">스테이지 '+currentStageId+' · WAVE '+stageWaveNum+'에서 사망</p><p style="color:#888;font-size:12px">클릭해서 스테이지 선택으로</p>';
+  // 죽으면 이어하기 기록을 지워 그 스테이지를 1웨이브부터 다시 하게 한다
+  // (ESC 로 나간 경우만 이어하기가 남는다)
+  stageWaveNum=1;pickedUpgrades=[];saveProg();
 }
 
 function updatePlayer(dt){
