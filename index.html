@@ -2231,7 +2231,8 @@ function showClassSelect(sid){
   document.getElementById('class-select').classList.add('active');
 }
 
-document.getElementById('class-confirm').addEventListener('click',()=>{
+document.getElementById('class-confirm').addEventListener('click',()=>confirmClass());
+function confirmClass(){
   if(!currentClass) currentClass=CLASSES[0];
   document.getElementById('class-select').classList.remove('active');
   // 플래그 확실히 해제 — 이 두 값이 true면 게임 시작 불가
@@ -2246,7 +2247,7 @@ document.getElementById('class-confirm').addEventListener('click',()=>{
   document.getElementById('skill-bar').classList.add('visible');
   // 실제 스테이지 시작
   doStartStage(pendingStageId);
-});
+}
 
 // ══════════════════════════════════════════════════════
 const scene = new THREE.Scene();
@@ -4716,7 +4717,7 @@ function showStageLobby(afterClear){
       '<div class="ls">'+s.sub+'</div>'+
       '<div class="ldiff">'+stars+'</div>'+
       '<div class="ldesc">'+s.desc+'</div>'+
-      (hasResume?'<div class="lwv" style="color:#ffcc00;">▶ WAVE '+sv2.lastWave+'부터 이어하기</div>':'')+
+      (hasResume?'<div class="lwv" style="color:#ffcc00;">▶ WAVE '+sv2.lastWave+'부터 이어하기'+((c=>c?' · '+c.icon+' '+c.name:'')(CLASSES.find(c=>c.id===sv2.lastClass)))+'</div>':'')+
       '<div class="lwv">WAVES: '+s.waves+'</div>';
     if(unlocked) card.addEventListener('click',()=>startStage(s.id));
     cardsEl.appendChild(card);
@@ -4744,6 +4745,14 @@ function showStageLobby(afterClear){
 }
 
 function startStage(sid){
+  // 이어하기면 그 판의 클래스로 바로 들어간다 — ESC 로 나갔다 오며 클래스를 바꾸지 못하게
+  const sv=loadSave();
+  const keep=sv.lastStage===sid&&sv.lastWave>1&&CLASSES.find(c=>c.id===sv.lastClass);
+  if(keep){
+    currentClass=keep;pendingStageId=sid;
+    document.getElementById('stage-lobby').classList.remove('active');
+    confirmClass();return;
+  }
   // 클래스 선택 먼저
   showClassSelect(sid);
 }
@@ -4939,11 +4948,11 @@ let SAVE_KEY=LEGACY_SAVE_KEY;            // 로그인한 계정에 따라 바뀌
 const ACCOUNTS_KEY='tac_surv_accounts';
 const SESSION_KEY='tac_surv_session';
 function loadSave(){
-  try{const d=JSON.parse(localStorage.getItem(SAVE_KEY));if(d)return{cleared:d.cleared?new Set(d.cleared):new Set(),lastStage:d.lastStage||0,lastWave:d.lastWave||0,pickedUpgrades:Array.isArray(d.pickedUpgrades)?d.pickedUpgrades:[]};}catch(e){}
-  return{cleared:new Set(),lastStage:0,lastWave:0,pickedUpgrades:[]};
+  try{const d=JSON.parse(localStorage.getItem(SAVE_KEY));if(d)return{cleared:d.cleared?new Set(d.cleared):new Set(),lastStage:d.lastStage||0,lastWave:d.lastWave||0,lastClass:d.lastClass||null,pickedUpgrades:Array.isArray(d.pickedUpgrades)?d.pickedUpgrades:[]};}catch(e){}
+  return{cleared:new Set(),lastStage:0,lastWave:0,lastClass:null,pickedUpgrades:[]};
 }
 function saveProg(){
-  try{localStorage.setItem(SAVE_KEY,JSON.stringify({cleared:[...clearedStages],lastStage:currentStageId,lastWave:stageWaveNum,pickedUpgrades:pickedUpgrades}));}catch(e){}
+  try{localStorage.setItem(SAVE_KEY,JSON.stringify({cleared:[...clearedStages],lastStage:currentStageId,lastWave:stageWaveNum,lastClass:currentClass?currentClass.id:null,pickedUpgrades:pickedUpgrades}));}catch(e){}
 }
 const saveData=loadSave();
 const clearedStages=saveData.cleared;
