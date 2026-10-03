@@ -4347,7 +4347,7 @@ function applyBuff(type){
   const el=document.getElementById('ehp-text');
   if(type==='heal'){playerHP=Math.min(playerHP+30,100);hpBar.style.width=playerHP+'%';if(el){el.innerText='💊 체력 +30!';setTimeout(()=>el.innerText='',2000);}}
   else if(type==='speed'){applySpeedOrb();if(el){el.innerText='⚡ 속도 부스트! '+SPEED_ORB_DUR+'초';setTimeout(()=>el.innerText='',2000);}}
-  else if(type==='ammo'){ammo=Math.floor(wD.mag*mods.magMult);ammoEl.innerText=ammo;rldTxt.innerText='';if(el){el.innerText='🔴 탄약 보충!';setTimeout(()=>el.innerText='',2000);}}
+  else if(type==='ammo'){ammo=Math.floor(wD.mag*mods.magMult);ammoEl.innerText=ammo;rldTxt.innerText='';if(el){el.innerText='🟡 탄약 보충!';setTimeout(()=>el.innerText='',2000);}}
   else if(type==='dmg'){mods.dmgMult=Math.min(mods.dmgMult+0.25,2.5);if(el){el.innerText='🔥 피해 증가!';setTimeout(()=>el.innerText='',2000);}}
 }
 
