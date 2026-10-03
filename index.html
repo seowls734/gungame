@@ -1729,7 +1729,7 @@ const CLASSES=[
   {
     id:'paladin', name:'성기사', icon:'⚜️',
     desc:'신성한 힘으로 심판하고 치유한다.',
-    passive:{txt:'받는 피해 12% 감소, 초당 HP +0.4', ap:()=>{ mods.armorMult*=0.88;mods.regenRate+=0.4; }},
+    passive:{txt:'받는 피해 12% 감소, 초당 HP +0.4, 이동속도 +15%', ap:()=>{ mods.armorMult*=0.88;mods.regenRate+=0.4;mods.speedMult*=1.15; }},
     skills:{
       c:{name:'천벌', icon:'✨', cd:10, desc:'가장 가까운 적에 75 피해 + 주변 4m 35 피해',
          fn:()=>{
