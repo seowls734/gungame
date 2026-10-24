@@ -68,6 +68,15 @@ body{overflow:hidden;background:#000;font-family:'Courier New',monospace}
 #wave-hud .wlabel{font-size:11px;letter-spacing:2px;color:#aaa}
 #wave-hud .wval{font-size:22px;font-weight:bold;color:#00ff88}
 #wave-hud .kprog{font-size:13px;color:#aaa;margin-top:3px}
+#def-hud{display:none;margin-top:4px}
+#def-hud .dtime{font-size:14px;color:#ffcc44;font-weight:bold;margin-top:2px}
+#def-hud .dlabel{font-size:11px;letter-spacing:2px;color:#44ffff;margin-top:6px}
+#def-hud .kbar-wrap{border-color:rgba(68,255,255,0.45);background:rgba(0,200,255,0.1)}
+#lobby-meta .lmode{display:flex;gap:0}
+#lobby-meta .lmode button{padding:9px 16px;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.18);color:#777;font-family:'Courier New',monospace;font-size:13px;letter-spacing:1px;cursor:pointer}
+#lobby-meta .lmode button.on{border-color:#00ff88;color:#00ff88;background:rgba(0,60,30,0.5)}
+#lobby-meta .lmode button.on.def{border-color:#44ffff;color:#44ffff;background:rgba(0,50,60,0.5)}
+.lbadge-def{color:#44ffff;border:1px solid rgba(68,255,255,0.4);background:rgba(0,70,90,0.25)}
 #wave-hud .kbar-wrap{width:160px;height:8px;background:rgba(0,255,80,0.12);border:1px solid rgba(0,255,80,0.3);margin-top:4px;margin-left:auto}
 #wave-hud .kbar{height:100%;background:linear-gradient(90deg,#00cc66,#00ff88);transition:width 0.2s}
 /* Upgrade select overlay (between waves within a stage) */
@@ -374,6 +383,7 @@ body{overflow:hidden;background:#000;font-family:'Courier New',monospace}
   <div class="wlabel">STAGE <span id="stage-num">1</span> · WAVE</div>
   <div class="wval" id="wave-num">1/3</div>
   <div class="kprog">EX: <span id="kill-cur">0</span> / <span id="kill-tgt">10</span></div>
+  <div id="def-hud"><div class="dtime" id="def-time"></div><div class="dlabel">🛡️ CORE <span id="core-hp"></span></div><div class="kbar-wrap"><div class="kbar" id="core-bar" style="width:100%"></div></div></div>
   <div class="kbar-wrap"><div class="kbar" id="kill-bar" style="width:0%"></div></div>
 </div>
 <div id="stage-select">
@@ -4483,6 +4493,11 @@ function updateEnemyBullets(dt){
       if(playerHP<=0){endGame();}
       rm=true;
     }
+    // 거점 방어: 코어에 맞은 적 탄
+    if(!rm&&core&&core.hp>0&&isDef()){
+      const cx=b.position.x-core.x,cz=b.position.z-core.z;
+      if(cx*cx+cz*cz<1.9*1.9&&b.position.y<4.2){damageCore(b.userData.damage);spawnImpactFX(b.position.clone());rm=true;}
+    }
     if(!rm&&isBlocked(b.position.x,b.position.z,0.1,b.position.y,b.position.y)){
       spawnImpactFX(b.position.clone());
       if(b.userData.isSplash)spawnExplosionFX(b.position.clone());
@@ -4699,6 +4714,124 @@ function updateBossHUD(show,dt){
   if(bossCalloutT>0)bossCalloutT-=dt;
   bossHudEl.children[2].textContent=bossCalloutT>0?bossCallout:'';
 }
+// ══════════════════════════════════════════════════════
+//  거점 방어 모드 — 코어를 지키며 웨이브마다 제한 시간을 버틴다
+//  적은 코어로 몰려가다가 플레이어가 가까이 오면 플레이어를 노린다. 코어가 부서지면 패배.
+// ══════════════════════════════════════════════════════
+let gameMode='normal';
+const isDef=()=>gameMode==='defense';
+const CORE_R=1.6;            // 코어 표면까지의 거리로 적의 사거리를 잰다
+const CORE_AGGRO=9, CORE_AGGRO_OFF=16;
+let core=null;               // { x, z, hp, max, mesh, crystal, ring, hitT, warned }
+let defT=0;                  // 이번 웨이브 남은 버티기 시간
+const coreMods={armor:1,turret:0,turretT:0};
+function resetCoreMods(){coreMods.armor=1;coreMods.turret=0;coreMods.turretT=0;}
+const coreMaxHP=()=>1000+currentStageId*60;
+
+const DEF_UPGRADES=[
+  {id:'corefix',   icon:'🔧',name:'코어 긴급 수리',desc:'코어 HP +40% 회복',tag:'CORE',tc:'tag-heal',apply:()=>{if(core)core.hp=Math.min(core.max,core.hp+core.max*0.4);}},
+  {id:'corearmor', icon:'🧱',name:'코어 장갑판',   desc:'코어가 받는 피해 -25%',tag:'CORE',tc:'tag-def',apply:()=>{coreMods.armor=Math.max(0.4,coreMods.armor*0.75);}},
+  {id:'coreturret',icon:'🗼',name:'코어 방어 포탑',desc:'코어가 주변 적을 자동 사격 (겹치면 더 빠르게, 최대 3)',tag:'CORE',tc:'tag-atk',apply:()=>{coreMods.turret=Math.min(3,coreMods.turret+1);}},
+];
+const findUpgrade=id=>UPGRADES.find(x=>x.id===id)||DEF_UPGRADES.find(x=>x.id===id);
+
+function buildCore(x,z){
+  const g=new THREE.Group();
+  const base=new THREE.Mesh(new THREE.CylinderGeometry(1.5,1.8,0.6,10),new THREE.MeshStandardMaterial({color:0x2a3340,roughness:0.5,metalness:0.7}));
+  base.position.y=0.3;g.add(base);
+  for(let k=0;k<4;k++){
+    const a=k/4*Math.PI*2+Math.PI/4;
+    const pil=new THREE.Mesh(new THREE.BoxGeometry(0.25,2.4,0.25),new THREE.MeshStandardMaterial({color:0x3a4656,roughness:0.4,metalness:0.8}));
+    pil.position.set(Math.cos(a)*1.15,1.5,Math.sin(a)*1.15);g.add(pil);
+  }
+  const crystal=new THREE.Mesh(new THREE.OctahedronGeometry(0.85,0),new THREE.MeshStandardMaterial({color:0x44ffff,emissive:0x00aacc,emissiveIntensity:1.4,roughness:0.15,metalness:0.3}));
+  crystal.position.y=2.3;crystal.scale.y=1.5;g.add(crystal);
+  const ring=new THREE.Mesh(new THREE.TorusGeometry(1.3,0.06,6,32),new THREE.MeshBasicMaterial({color:0x44ffff}));
+  ring.position.y=2.3;ring.rotation.x=Math.PI/2;g.add(ring);
+  const glow=new THREE.Mesh(new THREE.SphereGeometry(1.6,14,10),new THREE.MeshBasicMaterial({color:0x44ffff,transparent:true,opacity:0.08,depthWrite:false}));
+  glow.position.y=2.3;g.add(glow);
+  const zone=new THREE.Mesh(new THREE.RingGeometry(3.6,3.8,48),new THREE.MeshBasicMaterial({color:0x44ffff,transparent:true,opacity:0.35,side:THREE.DoubleSide,depthWrite:false}));
+  zone.rotation.x=-Math.PI/2;zone.position.y=0.04;g.add(zone);
+  g.position.set(x,0,z);
+  scene.add(g);mapMeshes.push(g);
+  OBST.push({x,z,hw:1.3,hd:1.3,yMin:0,yMax:4});
+  const max=coreMaxHP();
+  core={x,z,hp:max,max,mesh:g,crystal,ring,hitT:0,warned:false};
+}
+// 플레이어 바로 앞(맵 중앙 쪽)에 코어를 세운다
+function placeCore(spX,spZ){
+  const cands=[[spX,spZ-9],[spX+6,spZ-9],[spX-6,spZ-9],[spX,spZ-14],[spX+9,spZ],[spX-9,spZ]];
+  for(let r=16;r<60;r+=6)for(let a=0;a<8;a++)cands.push([spX+Math.cos(a/8*Math.PI*2)*r,spZ+Math.sin(a/8*Math.PI*2)*r]);
+  const p=cands.find(([x,z])=>Math.abs(x)<LIM-8&&Math.abs(z)<LIM-8&&!isBlocked(x,z,2.6))||[spX,spZ-9];
+  buildCore(p[0],p[1]);
+}
+function damageCore(d){
+  if(!core||core.hp<=0||gameOver)return;
+  core.hp-=d*0.4*coreMods.armor;core.hitT=0.15;
+  if(!core.warned&&core.hp<core.max*0.3){core.warned=true;showSkillNotify('⚠️ 코어 위험! 돌아가서 지키세요');}
+  if(core.hp<=0){
+    core.hp=0;
+    spawnExplosionFX(new THREE.Vector3(core.x,2,core.z));
+    core.mesh.visible=false;
+    endGame('🛡️ 코어가 파괴됐어요');
+  }
+}
+// 적이 코어를 노릴지: 플레이어가 가까우면(어그로) 플레이어, 아니면 코어. 보스는 언제나 플레이어.
+function coreTargetFor(e,ud){
+  if(!isDef()||!core||core.hp<=0||ud.isBoss||ud.isMidBoss)return false;
+  const pd=Math.hypot(yawObj.position.x-e.position.x,yawObj.position.z-e.position.z);
+  if(pd<CORE_AGGRO)ud.aggro=true;else if(pd>CORE_AGGRO_OFF)ud.aggro=false;
+  return !ud.aggro;
+}
+const coreAimPoint=()=>new THREE.Vector3(core.x+(Math.random()-0.5)*0.8,1.6+Math.random()*1.4,core.z+(Math.random()-0.5)*0.8);
+
+// 웨이브 시작: 처치 목표 대신 버티기 시간. 보스·미니보스가 있으면 시간이 끝나도 처치해야 넘어간다.
+function defWaveStart(next){
+  if(!isDef())return;
+  waveTarget=1e9;
+  const final=stageWaveNum>=getCurStage().waves;
+  defT=final?30:35+stageWaveNum*5;
+  if(next&&core&&core.hp>0){core.hp=Math.min(core.max,core.hp+core.max*0.15);core.warned=core.hp<core.max*0.3;}
+  updateWaveHUD();
+}
+const bossAlive=()=>enemies.some(e=>e.userData.isBoss||e.userData.isMidBoss);
+
+function updateDefense(dt){
+  if(!isDef()||!core)return;
+  core.crystal.rotation.y+=dt*1.6;core.ring.rotation.z+=dt*0.9;
+  if(core.hitT>0){core.hitT-=dt;core.crystal.material.emissive.setHex(0xff2244);}
+  else core.crystal.material.emissive.setHex(core.hp<core.max*0.3?((performance.now()/250|0)%2?0xff2244:0x00aacc):0x00aacc);
+  // 코어 방어 포탑
+  if(coreMods.turret>0&&!mods._timeStop&&core.hp>0){
+    coreMods.turretT-=dt;
+    if(coreMods.turretT<=0){
+      let best=-1,bd=26;
+      for(let k=0;k<enemies.length;k++){const d=Math.hypot(enemies[k].position.x-core.x,enemies[k].position.z-core.z);if(d<bd){bd=d;best=k;}}
+      if(best>=0){
+        const e=enemies[best],ud=e.userData;
+        spawnLightningArc(new THREE.Vector3(core.x,3.4,core.z),e.position.clone().setY(2.2*(e.scale.x||1)),0x44ffff);
+        ud.hp-=eMaxHP()*0.45;ud.flashT=0.15;
+        if(ud.hp<=0){spawnFX(e.position.clone());_lastKilledEnemy=e;scene.remove(e);enemies.splice(best,1);onKill();}
+      }
+      coreMods.turretT=0.9/coreMods.turret;
+    }
+  }
+  if(waveActive&&!choosingStage&&!gameOver){
+    if(defT>0)defT-=dt;
+    if(defT<=0&&!bossAlive())waveComplete();
+  }
+  updateDefHUD();
+}
+function updateDefHUD(){
+  const t=document.getElementById('def-time');if(!t||!isDef())return;
+  t.innerText=defT>0?'⏱ 버티기 '+Math.ceil(defT)+'초':bossAlive()?'👹 보스를 처치하세요!':'✓ 방어 성공';
+  if(core){
+    document.getElementById('core-hp').innerText=Math.ceil(core.hp)+' / '+core.max;
+    const bar=document.getElementById('core-bar');
+    bar.style.width=(core.hp/core.max*100)+'%';
+    bar.style.background=core.hp<core.max*0.3?'linear-gradient(90deg,#ff2244,#ff6655)':'linear-gradient(90deg,#00aacc,#44ffff)';
+  }
+}
 
 function spawnBossEnemy(type){
   let variant=null;
@@ -4910,6 +5043,12 @@ function updateWaveHUD(){
   if(killTgtEl) killTgtEl.innerText=waveTarget;
   const pct=Math.min(100,waveKills/waveTarget*100);
   if(killBarEl) killBarEl.style.width=pct+'%';
+  // 거점 방어: 처치 수 대신 버티기 시간과 코어 HP
+  const d=isDef();
+  document.querySelector('#wave-hud .kprog').style.display=d?'none':'';
+  killBarEl.parentNode.style.display=d?'none':'';
+  document.getElementById('def-hud').style.display=d?'block':'none';
+  if(d)updateDefHUD();
 }
 
 let _lastKilledEnemy=null;
@@ -4949,9 +5088,9 @@ function waveComplete(){
 
 let stageClearInfo=null;   // 로비에 띄울 클리어 정보 { name, reward, first }
 function stageComplete(){
-  const _st=getCurStage(),_first=!clearedStages.has(currentStageId);
+  const _st=getCurStage(),_first=!(isDef()?defCleared:clearedStages).has(currentStageId);
   stageClearInfo={name:_st.name,first:_first,reward:earn((_first?60:25)*_st.diff+20)};
-  clearedStages.add(currentStageId);
+  (isDef()?defCleared:clearedStages).add(currentStageId);
   currentStageId=0;stageWaveNum=0;
   pickedUpgrades=[];
   saveProg();
@@ -4972,21 +5111,29 @@ function showStageLobby(afterClear){
   cardsEl.innerHTML='';
   if(!document.getElementById('lobby-meta')){
     const lm=document.createElement('div');lm.id='lobby-meta';
-    lm.innerHTML='<span class="lcred" id="lobby-cred"></span><button id="shop-open">🛒 상점 · 부착물</button>';
+    lm.innerHTML='<div class="lmode"><button data-mode="normal">🎯 섬멸전</button><button data-mode="defense" class="def">🛡️ 거점 방어</button></div>'
+      +'<span class="lcred" id="lobby-cred"></span><button id="shop-open">🛒 상점 · 부착물</button>';
     lobbyEl.insertBefore(lm,cardsEl);
     lm.querySelector('#shop-open').addEventListener('click',e=>{e.stopPropagation();openShop();});
+    lm.querySelectorAll('[data-mode]').forEach(b=>b.addEventListener('click',e=>{
+      e.stopPropagation();
+      if(gameMode===b.dataset.mode)return;
+      gameMode=b.dataset.mode;saveMeta();showStageLobby(false);
+    }));
   }
+  document.querySelectorAll('#lobby-meta [data-mode]').forEach(b=>b.classList.toggle('on',b.dataset.mode===gameMode));
+  lobbyEl.querySelector('.lsub').innerText=isDef()?'🛡️ 거점 방어 — 코어를 지키며 제한 시간을 버티세요 · 크레딧 1.3배':'스테이지를 선택하세요';
   updateCreditUI();
   STAGES.forEach(s=>{
-    const unlocked=s.id===1||clearedStages.has(s.id-1);
-    const cleared=clearedStages.has(s.id);
+    const unlocked=s.id===1||clearedStages.has(s.id-1)||defCleared.has(s.id-1);
+    const cleared=isDef()?defCleared.has(s.id):clearedStages.has(s.id);
     const card=document.createElement('div');
     card.className='lobby-card'+(cleared?' lclr':'')+(!unlocked?' lk':'');
     const stars=Array.from({length:5},(_,i)=>'<div class="lstar'+(i<s.diff?' on':'')+'"></div>').join('');
     const sv2=loadSave();
-    const hasResume=sv2.lastStage===s.id&&sv2.lastWave>1;
+    const hasResume=resumeOK(sv2,s.id);
     card.innerHTML=
-      (cleared?'<div class="lbadge lbadge-clear">CLEAR</div>':'')+
+      (cleared?(isDef()?'<div class="lbadge lbadge-def">🛡️ CLEAR</div>':'<div class="lbadge lbadge-clear">CLEAR</div>'):'')+
       (!unlocked?'<div class="lbadge lbadge-lock">🔒</div>':'')+
       (hasResume?'<div class="lbadge" style="color:#ffcc00;border:1px solid rgba(255,200,0,0.4);background:rgba(100,80,0,0.2)">WAVE '+sv2.lastWave+'</div>':'')+
       '<span class="li">'+s.icon+'</span>'+
@@ -5005,7 +5152,7 @@ function showStageLobby(afterClear){
     resetBtn.addEventListener('click',e=>{
       e.stopPropagation();
       if(confirm('모든 진행 데이터를 초기화하시겠습니까?')){
-        localStorage.removeItem(SAVE_KEY);clearedStages.clear();pickedUpgrades=[];setMeta({});
+        localStorage.removeItem(SAVE_KEY);clearedStages.clear();defCleared.clear();gameMode='normal';pickedUpgrades=[];setMeta({});
         showStageLobby(false);
       }
     });
@@ -5024,7 +5171,7 @@ function showStageLobby(afterClear){
 function startStage(sid){
   // 이어하기면 그 판의 클래스로 바로 들어간다 — ESC 로 나갔다 오며 클래스를 바꾸지 못하게
   const sv=loadSave();
-  const keep=sv.lastStage===sid&&sv.lastWave>1&&CLASSES.find(c=>c.id===sv.lastClass);
+  const keep=resumeOK(sv,sid)&&CLASSES.find(c=>c.id===sv.lastClass);
   if(keep){
     currentClass=keep;pendingStageId=sid;
     document.getElementById('stage-lobby').classList.remove('active');
@@ -5037,7 +5184,7 @@ function startStage(sid){
 function doStartStage(sid){
   currentStageId=sid;
   const sv=loadSave();
-  const resumeWave=(sv.lastStage===sid&&sv.lastWave>1)?sv.lastWave:1;
+  const resumeWave=resumeOK(sv,sid)?sv.lastWave:1;
   stageWaveNum=resumeWave;
   const st=getCurStage();
   clearAll();
@@ -5065,9 +5212,10 @@ function doStartStage(sid){
   if(currentClass&&currentClass.passive){try{currentClass.passive.ap();}catch(err){console.warn('클래스 패시브 적용 실패:',err);}}
   applyPerms();   // 상점 영구 강화
   // 이어하기 시 이전 업그레이드 재적용 — 같은 스테이지에 진입 중인 경우만
-  pickedUpgrades=(sv.lastStage===sid&&resumeWave>1&&Array.isArray(sv.pickedUpgrades))?[...sv.pickedUpgrades]:[];
+  resetCoreMods();
+  pickedUpgrades=(resumeOK(sv,sid)&&Array.isArray(sv.pickedUpgrades))?[...sv.pickedUpgrades]:[];
   for(const upId of pickedUpgrades){
-    const u=UPGRADES.find(x=>x.id===upId);
+    const u=findUpgrade(upId);
     if(u){try{u.apply();clampMods();}catch(err){console.warn('업그레이드 재적용 실패:',upId,err);}}
   }
   if(spawnInterval){clearInterval(spawnInterval);spawnInterval=null;}
@@ -5087,6 +5235,7 @@ function doStartStage(sid){
     }}
   }
   yawObj.position.set(spX,EYH,spZ);camera.rotation.set(0,0,0);camera.fov=75;camera.updateProjectionMatrix();
+  if(isDef()){placeCore(spX,spZ);defWaveStart(false);}
   gunGrp.position.set(0.24,-0.24,-0.50);gunGrp.rotation.set(0,0,0);
   rebuildGun(stW.includes(wKey)?wKey:stW[0]);updateUI();updateWBar();
   mouseDown=false;aiming=false;gunGrp.visible=true;
@@ -5102,6 +5251,7 @@ function doStartStage(sid){
   }else{
     instrEl.innerHTML='<h1>'+st.name+'</h1><p style="color:#00ff88;letter-spacing:2px;font-size:13px;margin-bottom:8px">'+st.sub+'</p><p>클릭하여 전투 시작</p><p>W A S D 이동 | SPACE 점프 | SHIFT 앉기 | 좌클릭 사격 | 우클릭 조준 | R 재장전</p><p>1~0 / Q / E 무기 선택 · 마우스 휠 무기 전환</p><div class="hint">웨이브 클리어 시 업그레이드 선택 → '+st.waves+'웨이브 모두 클리어하면 다음 스테이지 해금</div>';
   }
+  if(isDef())instrEl.innerHTML+='<p style="color:#44ffff;margin-top:10px">🛡️ 거점 방어 — 빛나는 코어를 지키며 웨이브마다 제한 시간을 버티세요. 코어가 부서지면 패배!</p>';
   instrEl.style.display='block';
   // 이어하기로 보스 웨이브에 진입 시 보스 스폰
   if(isFinalWave){
@@ -5120,7 +5270,9 @@ function showStageSelect(){
   if(!isMobile)ctrl.unlock();
   if(spawnInterval){clearInterval(spawnInterval);spawnInterval=null;}
   if(stageClearTxt) stageClearTxt.innerText='WAVE '+stageWaveNum+'/'+getCurStage().waves+' 클리어!';
-  const pool=[...UPGRADES].sort(()=>Math.random()-0.5).slice(0,3);
+  // 거점 방어에서는 코어 강화 카드가 하나 섞인다
+  const pool=isDef()?[...UPGRADES].sort(()=>Math.random()-0.5).slice(0,2).concat(DEF_UPGRADES[Math.floor(Math.random()*DEF_UPGRADES.length)]).sort(()=>Math.random()-0.5)
+    :[...UPGRADES].sort(()=>Math.random()-0.5).slice(0,3);
   stageCardsEl.innerHTML='';
   pool.forEach(u=>{
     const card=document.createElement('div');
@@ -5172,6 +5324,7 @@ function pickUpgrade(u){
   } else {
     waveTarget=st.waveBase+(stageWaveNum-1)*5;
   }
+  defWaveStart(true);   // 거점 방어: 버티기 시간 + 코어 15% 수리
   waveActive=true;
   updateWaveHUD();
   saveProg();
@@ -5227,12 +5380,14 @@ const ACCOUNTS_KEY='tac_surv_accounts';
 const SESSION_KEY='tac_surv_session';
 function loadSave(){
   try{const d=JSON.parse(localStorage.getItem(SAVE_KEY));if(d)return{cleared:d.cleared?new Set(d.cleared):new Set(),lastStage:d.lastStage||0,lastWave:d.lastWave||0,lastClass:d.lastClass||null,pickedUpgrades:Array.isArray(d.pickedUpgrades)?d.pickedUpgrades:[],
-    credits:d.credits||0,perm:d.perm||{},attOwned:d.attOwned||{},attEquip:d.attEquip||{}};}catch(e){}
-  return{cleared:new Set(),lastStage:0,lastWave:0,lastClass:null,pickedUpgrades:[],credits:0,perm:{},attOwned:{},attEquip:{}};
+    credits:d.credits||0,perm:d.perm||{},attOwned:d.attOwned||{},attEquip:d.attEquip||{},
+    mode:d.mode==='defense'?'defense':'normal',lastMode:d.lastMode||'normal',defCleared:Array.isArray(d.defCleared)?d.defCleared:[]};}catch(e){}
+  return{cleared:new Set(),lastStage:0,lastWave:0,lastClass:null,pickedUpgrades:[],credits:0,perm:{},attOwned:{},attEquip:{},mode:'normal',lastMode:'normal',defCleared:[]};
 }
 function saveProg(){
   try{localStorage.setItem(SAVE_KEY,JSON.stringify({cleared:[...clearedStages],lastStage:currentStageId,lastWave:stageWaveNum,lastClass:currentClass?currentClass.id:null,pickedUpgrades:pickedUpgrades,
-    credits:meta.credits,perm:meta.perm,attOwned:meta.attOwned,attEquip:meta.attEquip}));}catch(e){}
+    credits:meta.credits,perm:meta.perm,attOwned:meta.attOwned,attEquip:meta.attEquip,
+    mode:gameMode,lastMode:gameMode,defCleared:[...defCleared]}));}catch(e){}
 }
 // ══════════════════════════════════════════════════════
 //  크레딧 · 상점 · 부착물 — 계정 세이브에 함께 저장되고, 죽어도 사라지지 않는다
@@ -5250,7 +5405,7 @@ function setMeta(d){
 function saveMeta(){
   try{
     const raw=JSON.parse(localStorage.getItem(SAVE_KEY))||{};
-    Object.assign(raw,{credits:meta.credits,perm:meta.perm,attOwned:meta.attOwned,attEquip:meta.attEquip});
+    Object.assign(raw,{credits:meta.credits,perm:meta.perm,attOwned:meta.attOwned,attEquip:meta.attEquip,mode:gameMode});
     localStorage.setItem(SAVE_KEY,JSON.stringify(raw));
   }catch(e){}
 }
@@ -5259,7 +5414,7 @@ function updateCreditUI(){
   const lc=document.getElementById('lobby-cred');if(lc)lc.innerText='💰 '+meta.credits.toLocaleString()+' CREDIT';
 }
 function earn(n){
-  n=Math.round(n*(1+0.1*(meta.perm.loot||0)));
+  n=Math.round(n*(1+0.1*(meta.perm.loot||0))*(isDef()?1.3:1));
   if(n<=0)return 0;
   meta.credits+=n;updateCreditUI();
   return n;
@@ -5440,6 +5595,10 @@ shopEl.addEventListener('click',e=>{
 const saveData=loadSave();
 setMeta(saveData);
 const clearedStages=saveData.cleared;
+const defCleared=new Set(saveData.defCleared);   // 거점 방어로 깬 스테이지
+gameMode=saveData.mode;
+// 이어하기는 같은 모드로 하던 판에만 쓴다
+const resumeOK=(sv,sid)=>sv.lastStage===sid&&sv.lastWave>1&&(sv.lastMode||'normal')===gameMode;
 let showingLobby=false;
 function getCurStage(){return STAGES.find(s=>s.id===currentStageId)||STAGES[0];}
 
@@ -5779,6 +5938,7 @@ function clearAll(){
   removePlacePreview();placingSkill=null;
   document.getElementById('place-hint')?.remove();
   clearBossHazards();
+  core=null;
 }
 function resetGame(){
   clearAll();if(spawnInterval){clearInterval(spawnInterval);spawnInterval=null;}spawnWasStopped=false;
@@ -5790,11 +5950,11 @@ function resetGame(){
   const scopeEl=document.getElementById('scope-overlay');if(scopeEl)scopeEl.style.display='none';
   xhEl.style.display='block';xhEl.classList.remove('ads');showStageLobby(false);
 }
-function endGame(){
+function endGame(reason){
   gameOver=true;mobileActive=false;ctrl.unlock();
   pauseOverlay.classList.remove('active'); // 게임오버 시 일시정지 오버레이 제거
   instrEl.style.display='block';
-  instrEl.innerHTML='<h1>GAME OVER</h1><p style="font-size:18px;margin:12px 0;color:#ff5555;">스테이지 '+currentStageId+' · WAVE '+stageWaveNum+'에서 사망</p><button id="go-restart">↻ 이 스테이지 다시 시작</button><p style="color:#888;font-size:12px;margin-top:12px">다른 곳을 클릭하면 스테이지 선택으로</p>';
+  instrEl.innerHTML='<h1>GAME OVER</h1><p style="font-size:18px;margin:12px 0;color:#ff5555;">'+(reason?reason+' — ':'')+'스테이지 '+currentStageId+' · WAVE '+stageWaveNum+(reason?'':'에서 사망')+'</p><button id="go-restart">↻ 이 스테이지 다시 시작</button><p style="color:#888;font-size:12px;margin-top:12px">다른 곳을 클릭하면 스테이지 선택으로</p>';
   document.getElementById('go-restart').addEventListener('click',e=>{e.stopPropagation();restartStage();});
   // 죽으면 이어하기 기록을 지워 그 스테이지를 1웨이브부터 다시 하게 한다
   // (ESC 로 나간 경우만 이어하기가 남는다)
@@ -5859,8 +6019,11 @@ function updateEnemies(dt){
   for(let i=enemies.length-1;i>=0;i--){
     const e=enemies[i],ud=e.userData;
     const ef=new THREE.Vector3(e.position.x,0,e.position.z);
-    const dir=new THREE.Vector3().subVectors(cf,ef);const dist=dir.length();
-    if(dist>0.001)dir.normalize();
+    // 거점 방어: 플레이어가 멀면 코어로 간다. 거리는 코어 표면까지로 잰다.
+    const toCore=coreTargetFor(e,ud);
+    const dir=toCore?new THREE.Vector3(core.x-ef.x,0,core.z-ef.z):new THREE.Vector3().subVectors(cf,ef);
+    const dist=toCore?Math.max(0,dir.length()-CORE_R):dir.length();
+    if(dir.lengthSq()>1e-6)dir.normalize();
     const baseSpd=getCurStage().spd;
     const espd=baseSpd*(ud.spdMult||1);
     const behavior=ud.behavior||'melee';
@@ -5912,7 +6075,7 @@ function updateEnemies(dt){
         // 사격
         if(ud.atkCd<=0&&dist<desiredRange+6){
           const muzzle=e.position.clone();muzzle.y=2.5;
-          const target=yawObj.position.clone();
+          const target=toCore?coreAimPoint():yawObj.position.clone();
           if(behavior==='sniper'){
             target.y-=0.2;
             spawnEnemyBullet(muzzle,target,55,22,0x88ff66,0.14);
@@ -5973,13 +6136,21 @@ function updateEnemies(dt){
       }
     }
 
-    e.lookAt(camera.position.x,2.2,camera.position.z);
+    if(toCore)e.lookAt(core.x,2.2,core.z);else e.lookAt(camera.position.x,2.2,camera.position.z);
     const moving=dist>2.3;
     if(moving)ud.walkT+=dt*(7*espd/0.85);
     const sw=moving?Math.sin(ud.walkT)*0.6:0;
     ud.aLG.rotation.x=sw;ud.aRG.rotation.x=-sw;ud.lLG.rotation.x=-sw;ud.lRG.rotation.x=sw;
     if(ud.flashT>0){ud.flashT-=dt;const t2=Math.max(0,ud.flashT/0.15);ud.bm.color.setRGB(1,t2*0.35,t2*0.35);if(ud.am)ud.am.color.setRGB(0.9+t2*0.1,t2*0.3,t2*0.3);}
 
+    // ── 코어 공격 ──
+    if(toCore){
+      if(behavior==='bomb'&&dist<2.6){
+        spawnExplosionFX(e.position.clone().setY(1.5));damageCore(60);
+        _lastKilledEnemy=e;scene.remove(e);enemies.splice(i,1);onKill();
+      }else if(behavior==='melee'&&dist<2.3)damageCore(17*(ud.dmgMult||1)*dt);
+      continue;
+    }
     // ── 접촉 공격 ──
     if(behavior==='bomb'&&dist<2.6&&Math.abs(yawObj.position.y-EYH)<3.5){
       // 자폭
@@ -7432,7 +7603,7 @@ function animate(){
   if(gamePaused){renderer.render(scene,camera);return;}
   const now=performance.now(),dt=Math.min((now-lastT)/1000,0.05);lastT=now;
   const isPlaying=(ctrl.isLocked||mobileActive)&&!gameOver;
-  if(isPlaying){_adaptRes(dt);updatePlayer(dt);updateGunRecoil(dt);updateAim();updateTimers(dt);updateEnemies(dt);updateBullets(dt);updateSkillShots(dt);updateEnemyBullets(dt);updateLaserBeams(dt);updateFX(dt);updateBuffItems(dt);updateGimmicks(dt);tickHitZone(dt);updateSkillHUD(dt);updateSkillFX(dt);updateDrone(dt);updateMines(dt);tickSkillNotify(dt);updatePlacePreview();updateBossHazards(dt);}
+  if(isPlaying){_adaptRes(dt);updatePlayer(dt);updateGunRecoil(dt);updateAim();updateTimers(dt);updateEnemies(dt);updateBullets(dt);updateSkillShots(dt);updateEnemyBullets(dt);updateLaserBeams(dt);updateFX(dt);updateBuffItems(dt);updateGimmicks(dt);tickHitZone(dt);updateSkillHUD(dt);updateSkillFX(dt);updateDrone(dt);updateMines(dt);tickSkillNotify(dt);updatePlacePreview();updateBossHazards(dt);updateDefense(dt);}
   updateBossHUD(isPlaying,dt);
   renderer.render(scene,camera);
 }
@@ -7526,6 +7697,7 @@ function enterGame(user){
   const d=loadSave();
   setMeta(d);
   clearedStages.clear();d.cleared.forEach(x=>clearedStages.add(x));
+  defCleared.clear();d.defCleared.forEach(x=>defCleared.add(x));gameMode=d.mode;
   currentStageId=d.lastStage||1;stageWaveNum=d.lastWave||1;
   pickedUpgrades=Array.isArray(d.pickedUpgrades)?d.pickedUpgrades.slice():[];
   $a('auth-bg').classList.remove('active');
