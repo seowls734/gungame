@@ -4667,12 +4667,16 @@ function onKill(killedEnemy){
   if(waveKills>=waveTarget) waveComplete();
 }
 
+// 웨이브 클리어 후 결과 화면이 뜨기 전 0.8초 — 이때 메뉴로 나가면 클리어가 날아가므로 막는다
+let waveClearing=false;
 function waveComplete(){
   playSound('wave');
   waveActive=false;
   if(spawnInterval){clearInterval(spawnInterval);spawnInterval=null;}
   spawnWasStopped=false;
+  waveClearing=true;
   later(()=>{
+    waveClearing=false;
     enemies.forEach(e=>scene.remove(e));enemies.length=0;
     bullets.forEach(b=>scene.remove(b));bullets.length=0;
     const st=getCurStage();
@@ -5016,7 +5020,7 @@ document.addEventListener('mouseup',e=>{
   if(e.button===2)aiming=false;
 });
 function goToMenu(){
-  if(showingLobby||choosingStage)return;
+  if(showingLobby||choosingStage||waveClearing)return;
   saveProg();clearAll();if(spawnInterval){clearInterval(spawnInterval);spawnInterval=null;}spawnWasStopped=false;
   mobileActive=false;ctrl.unlock();showStageLobby(false);
 }
@@ -5282,7 +5286,7 @@ function shoot(){
 let runGen=0;
 function later(fn,ms){const g=runGen;return setTimeout(()=>{if(g===runGen)fn();},ms);}
 function clearAll(){
-  runGen++;
+  runGen++;waveClearing=false;
   enemies.forEach(e=>scene.remove(e));enemies.length=0;
   bullets.forEach(b=>scene.remove(b));bullets.length=0;
   enemyBullets.forEach(b=>{scene.remove(b);b.geometry?.dispose?.();b.material?.dispose?.();});enemyBullets.length=0;
