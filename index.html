@@ -124,6 +124,8 @@ body{overflow:hidden;background:#000;font-family:'Courier New',monospace}
   #rotate-msg{display:flex}
 }
 /* Sensitivity settings */
+#restart-btn{position:absolute;top:156px;right:18px;z-index:14;pointer-events:auto;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.2);color:#aaa;font-family:'Courier New',monospace;font-size:10px;letter-spacing:1px;padding:4px 12px;cursor:pointer}
+#go-restart{margin-top:14px;padding:10px 26px;background:rgba(0,255,136,0.12);border:1px solid #00ff88;color:#00ff88;font-family:'Courier New',monospace;font-size:14px;letter-spacing:2px;cursor:pointer}
 #sens-btn{position:absolute;top:18px;left:50%;transform:translateX(-50%);z-index:14;pointer-events:auto;background:rgba(0,0,0,0.5);border:1px solid rgba(255,255,255,0.2);color:#aaa;font-family:'Courier New',monospace;font-size:10px;letter-spacing:1px;padding:4px 12px;cursor:pointer;display:none}
 #sens-panel{display:none;position:absolute;top:50px;left:50%;transform:translateX(-50%);z-index:40;background:rgba(0,0,0,0.92);border:1px solid rgba(0,255,100,0.3);padding:20px 28px;font-family:'Courier New',monospace;min-width:240px}
 #sens-panel.active{display:block}
@@ -395,6 +397,7 @@ body{overflow:hidden;background:#000;font-family:'Courier New',monospace}
   <div style="position:absolute;top:calc(50% + 178px);left:50%;transform:translateX(-50%);font-family:'Courier New',monospace;font-size:11px;color:rgba(0,200,80,0.5);letter-spacing:2px;">8x</div>
 </div>
 <div id="menu-btn">MENU</div>
+<div id="restart-btn">RESTART</div>
 <div id="sens-btn">SENS</div>
 <div id="sens-panel">
   <div class="stitle">SENSITIVITY</div>
@@ -5017,6 +5020,17 @@ function goToMenu(){
   saveProg();clearAll();if(spawnInterval){clearInterval(spawnInterval);spawnInterval=null;}spawnWasStopped=false;
   mobileActive=false;ctrl.unlock();showStageLobby(false);
 }
+// 지금 하던 스테이지를 같은 클래스로 1웨이브부터 다시 시작 (업그레이드도 초기화)
+function restartStage(){
+  if(showingLobby||currentStageId<=0)return;
+  const sid=currentStageId;
+  clearAll();if(spawnInterval){clearInterval(spawnInterval);spawnInterval=null;}spawnWasStopped=false;
+  stageWaveNum=1;pickedUpgrades=[];saveProg();
+  stageEl.classList.remove('active');pauseOverlay.classList.remove('active');
+  mobileActive=false;ctrl.unlock();
+  pendingStageId=sid;confirmClass();
+}
+document.getElementById('restart-btn').addEventListener('click',restartStage);
 const _gameKeys=new Set(['KeyW','KeyS','KeyA','KeyD','KeyR','KeyC','KeyE','KeyQ','Space','ControlLeft','ControlRight','ShiftLeft','ShiftRight','Digit1','Digit2','Digit3','Digit4','Digit5','Digit6','Digit7','Digit8','Digit9','Digit0']);
 document.addEventListener('keydown',e=>{
   if(e.code==='Escape'){goToMenu();return;}
@@ -5291,7 +5305,8 @@ function endGame(){
   gameOver=true;mobileActive=false;ctrl.unlock();
   pauseOverlay.classList.remove('active'); // 게임오버 시 일시정지 오버레이 제거
   instrEl.style.display='block';
-  instrEl.innerHTML='<h1>GAME OVER</h1><p style="font-size:18px;margin:12px 0;color:#ff5555;">스테이지 '+currentStageId+' · WAVE '+stageWaveNum+'에서 사망</p><p style="color:#888;font-size:12px">클릭해서 스테이지 선택으로</p>';
+  instrEl.innerHTML='<h1>GAME OVER</h1><p style="font-size:18px;margin:12px 0;color:#ff5555;">스테이지 '+currentStageId+' · WAVE '+stageWaveNum+'에서 사망</p><button id="go-restart">↻ 이 스테이지 다시 시작</button><p style="color:#888;font-size:12px;margin-top:12px">다른 곳을 클릭하면 스테이지 선택으로</p>';
+  document.getElementById('go-restart').addEventListener('click',e=>{e.stopPropagation();restartStage();});
   // 죽으면 이어하기 기록을 지워 그 스테이지를 1웨이브부터 다시 하게 한다
   // (ESC 로 나간 경우만 이어하기가 남는다)
   stageWaveNum=1;pickedUpgrades=[];saveProg();
