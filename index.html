@@ -5058,7 +5058,7 @@ function onKill(killedEnemy){
   const exp=(e&&e.userData&&e.userData.cfg&&e.userData.cfg.exp)||1;
   playSound('kill');
   // 크레딧: 적 경험치 × 스테이지 배율 (뒤 스테이지일수록 많이)
-  const got=earn(exp*(1+Math.floor(currentStageId/4)));
+  const got=earn(exp*goldMult());
   if(e&&e.userData&&(e.userData.isBoss||e.userData.isMidBoss))showSkillNotify('💰 +'+got+' CREDIT');
   waveKills+=exp;
   updateWaveHUD();
@@ -5071,7 +5071,7 @@ function onKill(killedEnemy){
 let waveClearing=false;
 function waveComplete(){
   playSound('wave');
-  earn(8+currentStageId*3);
+  earn(10*goldMult());
   waveActive=false;
   if(spawnInterval){clearInterval(spawnInterval);spawnInterval=null;}
   spawnWasStopped=false;
@@ -5089,7 +5089,7 @@ function waveComplete(){
 let stageClearInfo=null;   // 로비에 띄울 클리어 정보 { name, reward, first }
 function stageComplete(){
   const _st=getCurStage(),_first=!(isDef()?defCleared:clearedStages).has(currentStageId);
-  stageClearInfo={name:_st.name,first:_first,reward:earn((_first?60:25)*_st.diff+20)};
+  stageClearInfo={name:_st.name,first:_first,reward:earn((_first?100:40)*goldMult())};
   (isDef()?defCleared:clearedStages).add(currentStageId);
   currentStageId=0;stageWaveNum=0;
   pickedUpgrades=[];
@@ -5142,7 +5142,8 @@ function showStageLobby(afterClear){
       '<div class="ldiff">'+stars+'</div>'+
       '<div class="ldesc">'+s.desc+'</div>'+
       (hasResume?'<div class="lwv" style="color:#ffcc00;">▶ WAVE '+sv2.lastWave+'부터 이어하기'+((c=>c?' · '+c.icon+' '+c.name:'')(CLASSES.find(c=>c.id===sv2.lastClass)))+'</div>':'')+
-      '<div class="lwv">WAVES: '+s.waves+'</div>';
+      '<div class="lwv">WAVES: '+s.waves+'</div>'+
+      '<div class="lwv" style="color:#ffcc44">💰 보상 x'+Math.round(goldMult(s.id)*(isDef()?13:10))/10+'</div>';
     if(unlocked) card.addEventListener('click',()=>startStage(s.id));
     cardsEl.appendChild(card);
   });
@@ -5412,6 +5413,12 @@ function saveMeta(){
 function updateCreditUI(){
   const el=document.getElementById('credits');if(el)el.innerText=meta.credits.toLocaleString();
   const lc=document.getElementById('lobby-cred');if(lc)lc.innerText='💰 '+meta.credits.toLocaleString()+' CREDIT';
+}
+// 스테이지 보상 배율: 적이 단단한 스테이지(hpMult)일수록 크레딧을 더 많이 준다
+// 훈련장 x1.0 → 핵 발전소 x2.7 → 최후의 전투 x6.8 → 화산 분화구 x7.6
+function goldMult(sid){
+  const st=STAGES.find(s=>s.id===(sid===undefined?currentStageId:sid));
+  return st?Math.round((1+(st.hpMult-0.88)*1.5)*10)/10:1;
 }
 function earn(n){
   n=Math.round(n*(1+0.1*(meta.perm.loot||0))*(isDef()?1.3:1));
