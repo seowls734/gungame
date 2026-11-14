@@ -6970,7 +6970,8 @@ function spawnPsiCone(origin,dir,length,color){
   cone.scale.set(length*0.7,length,1);cone._baseScale=length;
   cone.userData={vel:new THREE.Vector3(),life:0.4,maxLife:0.4,type:'fade',startOpacity:0.6};
   scene.add(cone);skillFX.push(cone);
-  // 방사형 sparks
+  // 방사형 sparks — 바라보는 방향 기준 ±30°
+  const ang=Math.atan2(dir.x,dir.z);
   for(let i=0;i<14;i++){
     const a=ang+(Math.random()-0.5)*Math.PI/3;
     const t=Math.random();
